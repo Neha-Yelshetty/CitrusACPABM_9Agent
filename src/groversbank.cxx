@@ -17,3 +17,15 @@ void Groversbank::setgroverbankparameters(double profit,double hlbseverity,strin
         this->hlbseverity = hlbseverity;
         this->behaviortype = behaviortype;
 }
+
+void Groversbank::setgroverbankprofit(double profit) {
+        this->profit = profit;
+}
+
+
+void Groversbank::setgroverbankhlbseverity(double hlbseverity) {
+        this->hlbseverity = hlbseverity;
+}
+void Groversbank::setgroverbankbehaviortype(string behaviortype) {
+        this->behaviortype = behaviortype;
+}

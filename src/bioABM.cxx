@@ -1036,7 +1036,7 @@ void initializeCSV() {
     catch (exception e) {
         cout << e.what() << endl;
     }
-    csvFile << "t,i,j,numPsyllids,numInfectedPsyllids,hlbSeverity, experiment_id,alive,symptomatic\n";
+    csvFile << "t,i,j,numPsyllids,numInfectedPsyllids,hlbSeverity,actionType, experiment_id,alive,symptomatic\n";
 }
 
 /*****************************************

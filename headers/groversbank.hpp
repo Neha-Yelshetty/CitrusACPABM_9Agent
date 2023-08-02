@@ -26,6 +26,9 @@ public:
     string getgroversbankbehaviortype() { return this->behaviortype; }
 
     void setgroverbankparameters(double,double,string);
+    void setgroverbankprofit(double);
+    void setgroverbankhlbseverity(double);
+    void setgroverbankbehaviortype(string);
 
 
 };
