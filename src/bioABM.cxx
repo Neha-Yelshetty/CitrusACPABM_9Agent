@@ -61,15 +61,17 @@ double borderCrossingP = 0.01;
 bool outputFlag = false;
 float initialInfectedPortion = 0.18;
 int initialNumPsyllids = 300;
-int hlbseverityon = true;
+int hlbseverityon = false;
 
 // Lattice dimensions
-// paper size: 69(nR) x 157 (rL)
-const int rowLength = 69;
-const int numRows = 157;
+// paper size: 69(nR) x 157 (rL)  
+//33 * 75 - for all grover
+//11 * 25 - for one grover
+const int rowLength = 33; //11
+const int numRows = 75; //25
 const int hBorders = 0;
 const int vBorders = 0;
-
+int count = 0;
 
 #pragma endregion
 
@@ -211,7 +213,8 @@ struct FlushPatch {
         double hlbNum = (double)infected + (double)oldInfectedShoots;
         double hlbDenom = (double)uninfected + (double)oldUninfectedShoots + (double)hlbNum;
        
-      
+        //cout<<"Modelday:"<<getModelDay()<<"hlbDenom:"<<hlbDenom;
+
             if (hlbDenom == 0 || hlbseverityon) {
             
                 return 0;
@@ -219,6 +222,7 @@ struct FlushPatch {
             else {
                 assert((hlbNum / hlbDenom) >= 0 && (hlbNum / hlbDenom) <= 1);
                 double severity = hlbNum / hlbDenom;
+               // cout<<"severity:"<<severity<<endl;
                 return severity;
             }
         
@@ -733,6 +737,32 @@ void sprayTrees(double efficacy, vector<coord> locations) {
             }
         }
     }
+        
+}
+
+/****************************************************************
+* OTC Spray trees
+******************************************************************/
+void OTCsprayTrees(double efficacy, vector<coord> locations) {
+
+        int psyllidsRemoved = 0;
+    //cout << "Spraying on day: " << modelDay << " with efficacy " << efficacy << endl;
+    for (int i = 0; i < numRows; i++) {
+        for (int j = 0; j < rowLength; j++) {
+            //int r = locations[i].get<0>();
+            //int c = locations[i].get<1>();
+        
+            //int beforePsyllids = lattice[r][c].getTotalPsyllids();
+            lattice[i][j].numPsyllids_male = ceil((1.0 - efficacy) * (double)lattice[i][j].numPsyllids_male);
+            lattice[i][j].numPsyllids_female = ceil((1.0 - efficacy) * (double)lattice[i][j].numPsyllids_female);
+            lattice[i][j].numInfectedPsyllids_male = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedPsyllids_male);
+            lattice[i][j].numInfectedPsyllids_female = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedPsyllids_female);
+            for (int k = 0; k < 17; k++) {
+                lattice[i][j].numNymphs[k] = ceil((1.0 - efficacy) * (double)lattice[i][j].numNymphs[k]);
+                lattice[i][j].numInfectedNymphs[k] = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedNymphs[k]);
+            }
+        }
+    }
         /*int startingMales = lattice[r][c].numPsyllids_male;
         for (int j = 0; j < startingMales; j++) {
             if (doubleRand(0, 1) <= efficacy) {
@@ -776,8 +806,10 @@ void sprayTrees(double efficacy, vector<coord> locations) {
         int afterPsyllids = lattice[r][c].getTotalPsyllids();
         psyllidsRemoved += beforePsyllids - afterPsyllids;*/
     //}
-    //cout << "Spray removed " << psyllidsRemoved << endl;
+    //cout << "Spra
+
 }
+
 
 #pragma endregion
 

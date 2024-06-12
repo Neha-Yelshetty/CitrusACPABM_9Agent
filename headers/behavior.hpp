@@ -192,6 +192,46 @@ class SprayTrees: public Behavior {
         void executeAction(Grove *g);
 };
 
+class OTC: public Behavior {
+ private:
+    //window around target dates
+    int windowSize;
+    double otcefficacy;
+    //harvest start days
+    int start1;
+    int start2;
+    int start3;
+    //Cost per spray
+    double otcsprayCost;
+ public:
+        OTC(double otcefficacy, double otcsprayCost, int start1, int start2, int start3) {  
+            this->otcefficacy = otcefficacy;
+            this->otcsprayCost = otcsprayCost;
+            this->start1 = start1;
+            this->start2 = start2;
+            this->start3 = start3;
+            this->windowSize = 21; //Hard coded for 2nd manuscript
+        }
+        // //Fills planning Q with sprays in a window
+        void PlanActions();
+
+        //Returns expected value of this behavior pattern if continued until the end of the simulation
+        double SimulateOutcome(Grove * g, double risk, int simulationLength,int startingPeriod, double otcsprayCost);
+
+        //Returns the expected mean infection
+        double hlbSpread(int t, Grove *g) { return 0; }
+
+        //Returns the variable costs per year
+        double getVariableCosts() { return this->otcsprayCost; }
+        string getName() { return "OTC"; }
+        string getParams() { 
+            stringstream ss;
+            ss << otcefficacy << ";" << otcsprayCost;
+            return ss.str();
+        }
+
+        void executeAction(Grove *g);
+};
 
 /*
 class NoAction : public Behavior {

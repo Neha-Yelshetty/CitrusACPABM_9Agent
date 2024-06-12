@@ -8,6 +8,7 @@ using namespace std;
 #include "../headers/bioABM.h"
 #include "../headers/groversbank.hpp"
 #include "../headers/previousyearprofitdata.hpp"
+#include "../headers/grovernetworkinfo.hpp"
 //#include "../src/previousyearprofitdata.cxx"
 #include <boost/algorithm/string.hpp>
 #include <boost/math/distributions.hpp>
@@ -59,14 +60,20 @@ double lambda ;
 double referenceincome;
 double wl;
 double wh;
+double typeofnetwork;
+//string (*grovernetwrokinfo)[9];
+std::vector<std::vector<string>> grovernetwrokinfo;
+std::vector<std::vector<string>> groversprioritytoacessoxt;
 
 int experimentID;
 int memorylength = ParameterSet::parammemorylength;
 double memorylengthyear[ParameterSet::parammemorylength];
 Commodity cropvalue =Commodity();
 previousyearprofitdata prevdata = previousyearprofitdata();
-previousyearprofitdata pdata[500];
-int totalcountofpreviousdata = 500;
+previousyearprofitdata pdata[6105];
+int totalcountofpreviousdata = 6105;
+
+Grovernetworkinfo gnw = Grovernetworkinfo();
 
 boost::random::mt19937 econ_rng(std::time(0));
 boost::random::uniform_01<> econ_gen;
@@ -131,13 +138,17 @@ void InitialiseCHMA(Commodity crop) {
 
          for(int j=0; j<ParameterSet::gridWidth;j++){
         //Create grove
-                int i_lb = (i / ParameterSet::gridLength) * cropRowSize;
+                /*int i_lb = (i / ParameterSet::gridLength) * cropRowSize;
                 int i_ub = i_lb + cropRowSize;
                 int j_lb = (i % ParameterSet::gridLength) * cropColSize;
+                int j_ub = j_lb + cropColSize;*/
+                int i_lb = j * cropRowSize;
+                int i_ub = i_lb + cropRowSize;
+                int j_lb = i * cropColSize;
                 int j_ub = j_lb + cropColSize;
+                //cout << i <<"~~" << j <<"~~"<< i_lb <<"~~"<< i_ub <<"~~"<< j_lb <<"~~"<< j_ub << endl;
+
                 bool agency = (stoi(agencyParams[0]) == 1);
-
-
                  //Create and assign strategy vector
                 vector<string> sFlags_agent = split(sFlags[k], ",");
                 vector<string> sParams_agent = split(sParams[k], ",");
@@ -146,10 +157,11 @@ void InitialiseCHMA(Commodity crop) {
               
                 agents[i][j] = Grove(crop, agency, i_lb, i_ub, j_lb, j_ub);
 
-            
                 //Rogue trees
                 if (stoi(sFlags_agent[0]) == 1) {
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Rogue");
+                    stringstream ss;
+                    ss << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << ";" << stod(sParams_agent[0])<< ";" << stod(sParams_agent[1])<< ";" << stod(sParams_agent[4]);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Rogue",ss.str(),0,0);
                     Behavior* rogue =  new RogueTrees(stod(sParams_agent[0]),
                                                     stod(sParams_agent[1]),
                                                     stod(sParams_agent[2]),
@@ -163,7 +175,9 @@ void InitialiseCHMA(Commodity crop) {
                     
                 //Spraying
                 if (stoi(sFlags_agent[1]) == 1) {
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Spray");
+                    stringstream ss;
+                    ss << stod(sParams_agent[5]) << ";" << stod(sParams_agent[6]);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Spray",ss.str(),0,0);
                     Behavior* spray = new SprayTrees(stod(sParams_agent[5]),
                                                     stod(sParams_agent[6]),
                                                     bioABM::getSpringStart(),
@@ -171,10 +185,25 @@ void InitialiseCHMA(Commodity crop) {
                                                     bioABM::getFallStart());
                     agents[i][j].behaviorPatterns.push_back(spray);
                 }
+
+                //Oxytetracycline
+                if (stoi(sFlags_agent[2]) == 1) {
+                    stringstream ss;
+                    ss << stod(sParams_agent[7]) << ";" << stod(sParams_agent[8]);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"OTC",ss.str(),0,0);
+                    Behavior* otc = new OTC(stod(sParams_agent[7]),
+                                                    stod(sParams_agent[8]),
+                                                    bioABM::getSpringStart(),
+                                                    bioABM::getSummerStart(),
+                                                    bioABM::getFallStart());
+                    agents[i][j].behaviorPatterns.push_back(otc);
+                }
                             
                 //Denser planting
-                if (stoi(sFlags_agent[2]) == 1) {
-                  agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"DensePlanting");
+                if (stoi(sFlags_agent[3]) == 1) {
+                    stringstream ss;
+                    ss << stod(sParams_agent[9]) << ";" << stod(sParams_agent[10]);
+                  agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"DensePlanting",ss.str(),0,0);
                     Behavior * dPlant = new DensePlanting(
                         stod(sParams_agent[7]),
                         stod(sParams_agent[8])
@@ -182,18 +211,22 @@ void InitialiseCHMA(Commodity crop) {
                     agents[i][j].behaviorPatterns.push_back(dPlant);
                 }
 
-                if (stoi(sFlags_agent[3]) == 1) {
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"RectangularRogue");
+                if (stoi(sFlags_agent[4]) == 1) {
+                    stringstream ss;
+                    ss << stod(sParams_agent[11]) << ";" << stod(sParams_agent[12]) << ";" << stod(sParams_agent[13])<< ";" << stod(sParams_agent[14])<< ";" << stod(sParams_agent[15])<< ";" << stod(sParams_agent[16]);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"RectangularRogue",ss.str(),0,0);
                     Behavior * wideRogue = new RectangularRogue(
-                        stod(sParams_agent[9]),
-                        stod(sParams_agent[10]),
-                        stoi(sParams_agent[11]),
-                        stoi(sParams_agent[12]),
+                        stod(sParams_agent[11]),
+                        stod(sParams_agent[12]),
                         stoi(sParams_agent[13]),
-                        stod(sParams_agent[14])
+                        stoi(sParams_agent[14]),
+                        stoi(sParams_agent[15]),
+                        stod(sParams_agent[16])
                     );
                     agents[i][j].behaviorPatterns.push_back(wideRogue);
                 }
+
+                
                 
               // cout << i << j << agentsinfo[i][j].getgroversbankprofit() << agentsinfo[i][j].getgroversbankhlbseverity() << agentsinfo[i][j].getgroversbankbehaviortype() << endl;
 
@@ -201,6 +234,7 @@ void InitialiseCHMA(Commodity crop) {
         }
     }
 
+    
       
     //Initial logging and planning
     for (int i = 0; i < ParameterSet::gridLength ; i++) { 
@@ -211,6 +245,7 @@ void InitialiseCHMA(Commodity crop) {
         }
     }
 
+    
     
     return;
 }
@@ -245,10 +280,10 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     int k =0;   
   
 
-    int i_lb = (i / ParameterSet::gridLength) * cropRowSize;
+   /* int i_lb = (i / ParameterSet::gridLength) * cropRowSize;
     int i_ub = i_lb + cropRowSize;
     int j_lb = (i % ParameterSet::gridLength) * cropColSize;
-    int j_ub = j_lb + cropColSize;
+    int j_ub = j_lb + cropColSize;*/
     bool agency = (stoi(agencyParams[0]) == 1);
 
 
@@ -262,7 +297,9 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     agents[i][j].behaviorPatterns.clear();
     //Rogue trees
     if (changestratergname == "RogueTrees" ) {
-    agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Rogue");
+        stringstream ss;
+        ss << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << ";" << stod(sParams_agent[0])<< ";" << stod(sParams_agent[1])<< ";" << stod(sParams_agent[4]);
+    agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Rogue",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
        Behavior* rogue = new RogueTrees(stod(sParams_agent[2]),
                        stod(sParams_agent[3]),
                        stod(sParams_agent[0]),
@@ -276,7 +313,9 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
      
     //Spraying
     if (changestratergname == "SprayTrees") {
-     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Spray");
+     stringstream ss;
+        ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]);
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Spray",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
       Behavior* spray = new SprayTrees(stod(sParams_agent[0]),
                                         stod(sParams_agent[1]),
                                         bioABM::getSpringStart(),
@@ -285,6 +324,23 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
 
         agents[i][j].behaviorPatterns.clear();
         agents[i][j].behaviorPatterns.push_back(spray); 
+        agents[i][j].behaviorPatterns[0]->PlanActions();
+        
+    }
+
+    //Oxytetracycline
+    if (changestratergname == "OTC") {
+     stringstream ss;
+        ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]);
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"OTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+      Behavior* otc = new OTC(stod(sParams_agent[0]),
+                                        stod(sParams_agent[1]),
+                                        bioABM::getSpringStart(),
+                                        bioABM::getSummerStart(),
+                                        bioABM::getFallStart());
+
+        agents[i][j].behaviorPatterns.clear();
+        agents[i][j].behaviorPatterns.push_back(otc); 
         agents[i][j].behaviorPatterns[0]->PlanActions();
         
     }
@@ -445,7 +501,6 @@ double getMeanHLB(Grove g) {
     } else {
         return 0;
     }
-    
 }
 
 int getDeadTrees(Grove g) {
@@ -587,7 +642,7 @@ void Phase5() {
                     //agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost();
                     //FC
                     //agents[i][j].costs += agents[i][j].getFixedCosts();
-                    agents[i][j].costs += agents[i][j].getCrop()->costs;
+                    agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
                 }
                 
                 //Harvest
@@ -628,6 +683,24 @@ void Phase5() {
                     }
         }
         agentsinfo[i][j].setgroverbankparameters((agents[i][j].returns - agents[i][j].costs),meanSeverity,strategyNames.str());*/
+
+            
+            if(rel_t == 0)
+            {
+                int hlbyearcount = 0;
+                if(meanSeverity != 0)
+                {
+                    hlbyearcount = agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() + 1;
+                    agentsinfo[i][j].setgroversbankwithhlbseverityyearcount(hlbyearcount);
+                }
+                else
+                {
+                    hlbyearcount = agentsinfo[i][j].getgroversbanknohlbseverityyearcount() + 1;
+                    agentsinfo[i][j].setgroversbanknohlbseverityyearcount(hlbyearcount);
+                }
+                //cout<<"ishlbseverityexists:"<<rel_t<<"~~"<<meanSeverity<<"~~"<<agentsinfo[i][j].getgroversbankwithhlbseverityyearcount()<<"~~"<<agentsinfo[i][j].getgroversbanknohlbseverityyearcount()<<endl;
+            }
+            
 
              if(agents[i][j].behaviorPatterns.empty())
                 agentsinfo[i][j].setgroverbankparameters((agents[i][j].returns - agents[i][j].costs),meanSeverity, "NoAction");
@@ -768,9 +841,9 @@ double calculateSatisfaction(double income, double probability, double probdelta
 
 		satisfaction = value*phi;
 
-        //cout<<income<<"~"<<value<<"~"<<phiplus<<"~"<<phi<<"~"<<satisfaction<<endl;
+        //cout<<income<<"~"<<referenceincome<<"~"<<value<<"~"<<phiplus<<"~"<<phi<<"~"<<satisfaction<<endl;
 
-		return satisfaction;
+		return satisfaction; //satisfaction
  
 }
 
@@ -848,11 +921,11 @@ void buildingmemorylength(int i, int j,int year)
 
 *This function updates the income growth rates based on new income for farms.
 ***************************************************************/
-double calculateAveragePopulationIncomeChangeRate()
+double calculateAveragePopulationIncomeChangeRate(int currentrow,int currentcol)
 {
     std::vector<double> differenceIncomeYears ;
 	std::vector<double> populationYearlyMeanIncome ;
-		
+	string retrunvalue = "No";
 
     //double currentYearAverageIncome = mean(thisYearIncome);
    // populationYearlyMeanIncome.push_back(calculatemean(thisYearIncome));
@@ -862,7 +935,15 @@ double calculateAveragePopulationIncomeChangeRate()
             for(int i=0; i< ParameterSet::gridLength;i++){
                 for(int j=0; j<ParameterSet::gridWidth;j++){
                         if(agents[i][j].getActionType() != 1){
-                            incomeFarmYear.push_back(agents[i][j].memorylengthprofit[k]); 
+                            if(typeofnetwork == 1)
+                                retrunvalue = gnw.checkbondexists(grovernetwrokinfo,1,10,currentrow,currentcol,i,j);
+                            else if(typeofnetwork == 3)
+                                retrunvalue = gnw.checkbondexiststypetree(grovernetwrokinfo,9,10,currentrow,currentcol,i,j);
+                            else
+                                retrunvalue = gnw.checkbondexists(grovernetwrokinfo,9,10,currentrow,currentcol,i,j);
+
+                            if(retrunvalue == "Yes")
+                                incomeFarmYear.push_back(agents[i][j].memorylengthprofit[k]); 
                         }
                     }
             }
@@ -881,8 +962,6 @@ double calculateAveragePopulationIncomeChangeRate()
 
 		double changeRate = calculatemean(differenceIncomeYears);
 
-        cout<<"End of  iteration"<<endl;
-			
 		return changeRate;
 }
 
@@ -914,8 +993,9 @@ double calculateAveragePersonalIncomeChangeRate(int i,int j)
 /*************************************************************
 * Calculate Income Dissimilarity
 ***************************************************************/
-void calculateIncomeDissimilarity(int i, int j,int year,double AveragePopulationIncomeChangeRate)
+void calculateIncomeDissimilarity(int i, int j,int year)
 {
+    double AveragePopulationIncomeChangeRate = calculateAveragePopulationIncomeChangeRate(i,j);
     double diff = AveragePopulationIncomeChangeRate - calculateAveragePersonalIncomeChangeRate(i,j);
     //cout<< AveragePopulationIncomeChangeRate<< "__"<<calculateAveragePersonalIncomeChangeRate(i,j) << endl;
     agents[i][j].setIncomeDissimilarity(diff);
@@ -924,40 +1004,58 @@ void calculateIncomeDissimilarity(int i, int j,int year,double AveragePopulation
 /*************************************************************
 * Optimization
 ***************************************************************/
-void Optimization(int i, int j,int year,double currentprofit )
+void Optimization(int i, int j,int year,double currentprofit,double meanhlbseverity)
 {
     double maxamt = 0;
-    int highestindex = 0;
+    int highestindex = -1;
     int k = 0;
     for(k = 0 ;k < totalcountofpreviousdata;k++ )
     {
-        
-        if((pdata[k].getPreviousyeartime() > year && pdata[k].getPreviousyeartime() <= (year+5)) && pdata[k].getPreviousyearannualprofit() > currentprofit )
-        {
-            if(pdata[k].getPreviousyearannualprofit() > maxamt )
+        //cout<<"hlbseverityyearcount:"<<agentsinfo[i][j].getgroversbankhlbseverityyearcount() << endl;
+       // if((pdata[k].getPreviousyeartime() > year && pdata[k].getPreviousyeartime() <= (year+5)) && pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit )
+       if(meanhlbseverity == 0)
+       {
+            if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbanknohlbseverityyearcount() && pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > currentprofit)
             {
-                maxamt = pdata[k].getPreviousyearannualprofit();
-                highestindex =k;
+                if(pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > maxamt )
+                {
+                    maxamt = pdata[k].getPreviousyearcummulative5yearhlbzeroprofit();
+                    highestindex =k;
+                }
+                //cout<<"HLBZero"<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearcummulative5yearhlbzeroprofit()<<"---"<<currentprofit<<endl;
             }
-             // cout<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearannualprofit()<<"---"<<currentprofit<<endl;
-
-        }
+            if(pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbanknohlbseverityyearcount())
+                break;
+       }
+       else
+       {
+            if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() && pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit)
+            {
+                if(pdata[k].getPreviousyearcummulative5yearprofit() > maxamt )
+                {
+                    maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
+                    highestindex =k;
+                }
+               // cout<<"Normalmode"<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearcummulative5yearprofit()<<"---"<<currentprofit<<endl;
+            }
+            if(pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbankwithhlbseverityyearcount())
+                break;
+       }
+       
           
     }
-     if(highestindex != 0)
+     if(highestindex != -1)
      {
         // Stage 1.1 : Change of the grovers behaviour type
-        double hlbmean = getMeanHLB(agents[i][j]);
-        
-
+        //double hlbmean = getMeanHLB(agents[i][j]);
         vector<string> ssparam = split(pdata[highestindex].getPreviousyearstratergyparameter(), ",");
         vector<string> sparamstringVector;
         for (string s: ssparam) {
             sparamstringVector.push_back(s);
         }
-        double anualprofit = pdata[highestindex].getPreviousyearannualprofit();
+        double anualprofit = pdata[highestindex].getPreviousyearcummulative5yearprofit();
         cout<<"Highest Index"<< i<<"--"<<j<< "~~" << pdata[highestindex].getPreviousyearstratergyparameter()  << "~~" << pdata[highestindex].getPreviousyearstratergyname() <<"~~"<<anualprofit<<"~~"<<currentprofit << endl;
-        ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,pdata[highestindex].getPreviousyearstratergyname(),currentprofit,hlbmean); 
+        ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,pdata[highestindex].getPreviousyearstratergyname(),currentprofit,meanhlbseverity); 
         
         
      }
@@ -968,30 +1066,45 @@ void Optimization(int i, int j,int year,double currentprofit )
 /*************************************************************
 * Imitation
 ***************************************************************/
-void Imitation(int i, int j,int year,double currentprofit )
+void Imitation(int i, int j,int year,double currentprofit,double meanhlbseverity )
 {
-    double maxamt = 0;
+    double maxamt = -9999999999;
     int highestindex1 = -1,highestindex2 = -1;
     int k1,k2 = 0;
+    string retrunvalue = "No";
+    cout<<"Inside imitate"<<endl;
     for ( k1 = 0; k1 < ParameterSet::gridLength; k1++) {
         for( k2=0; k2<ParameterSet::gridWidth;k2++){
-        
-            if(agentsinfo[k1][k2].getgroversbankprofit() > currentprofit )
+
+            if(typeofnetwork == 1)
+                retrunvalue = gnw.checkbondexists(grovernetwrokinfo,1,10,i,j,k1,k2);
+            else if(typeofnetwork == 3)
+                retrunvalue = gnw.checkbondexiststypetree(grovernetwrokinfo,9,10,i,j,k1,k2);
+            else
+                retrunvalue = gnw.checkbondexists(grovernetwrokinfo,9,10,i,j,k1,k2);
+            
+            cout<<"Return value~~"<<i<<"-"<<j<<"-"<<k1<<"-"<<k2<<"-"<<retrunvalue<<endl ;
+            //cout<<agentsinfo[k1][k2].getgroversbankprofit() << "~~~~" << currentprofit << endl;
+            if(retrunvalue == "Yes")
             {
-                if(agentsinfo[k1][k2].getgroversbankprofit() > maxamt )
+                if(agentsinfo[k1][k2].getgroversbankprofit() > currentprofit )
                 {
-                    maxamt = agentsinfo[k1][k2].getgroversbankprofit();
-                    highestindex1 =k1;
-                    highestindex2 =k2;
+                    if(agentsinfo[k1][k2].getgroversbankprofit() > maxamt )
+                    {
+                        maxamt = agentsinfo[k1][k2].getgroversbankprofit();
+                        highestindex1 =k1;
+                        highestindex2 =k2;
+                    
+                    }
+                    // cout<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearannualprofit()<<"---"<<currentprofit<<endl;
                 }
-                // cout<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearannualprofit()<<"---"<<currentprofit<<endl;
             }
        }   
     }
      if(highestindex1 != -1 && highestindex2 != -1 )
      {
         // Stage 1.1 : Change of the grovers behaviour type
-        double hlbmean = getMeanHLB(agents[highestindex1][highestindex2]);
+        //double hlbmean = getMeanHLB(agents[highestindex1][highestindex2]);
 
         stringstream strategyNames;
         stringstream strategyParams;
@@ -1016,7 +1129,7 @@ void Imitation(int i, int j,int year,double currentprofit )
         }
         //double anualprofit = pdata[highestindex].getPreviousyearannualprofit();
         cout<<"Highest Index"<< highestindex1<<"--"<<highestindex2<< "~~" << strategyParams.str() << "~~" << strategyNames.str() <<"~~"<<maxamt<<"~~"<<currentprofit << endl;
-        ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,strategyNames.str(),currentprofit,hlbmean);  
+        ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,strategyNames.str(),currentprofit,meanhlbseverity);  
      }
         
 }
@@ -1040,36 +1153,53 @@ void Phase6() {
             }
         }
 
-        AveragePopulationIncomeChangeRate = calculateAveragePopulationIncomeChangeRate();
+       
 
         for ( i = 0; i < ParameterSet::gridLength; i++) {
             for( j=0; j<ParameterSet::gridWidth;j++){
                 if(agents[i][j].getActionType() != 1){
                 calcuatesatisfaction(i,j);
-                calculateIncomeDissimilarity(i,j,year,AveragePopulationIncomeChangeRate);
+                calculateIncomeDissimilarity(i,j,year);
                 if(agents[i][j].getIncomeDissimilarity() > wh)
                 {
-                    cout<<"Firstblock"<<endl;
                     if(agents[i][j].getSatisfaction() == 0)
+                    {
+                       cout<<"Firstblock-OptOut";
                        agents[i][j].setActionType(1); // Setting for the opt-out
+                    }
                     else
+                    {
+                      cout<<"Repetition";
                        agents[i][j].setActionType(2); //Repetition
+                    }
                 }
                 else if(wl<= agents[i][j].getIncomeDissimilarity() && agents[i][j].getIncomeDissimilarity()<= wh)
                 {
-                    cout<<"Hello"<<endl;
+                    
                     if(agents[i][j].getSatisfaction() == 0)
-                       agents[i][j].setActionType(2); // Repetition
+                    {
+                       cout<<"SecondBlock-optimization";
+                       agents[i][j].setActionType(3); // optimization
+                    }
                     else
-                       agents[i][j].setActionType(3); //optimization
+                    {
+                      cout<<"SecondBlock-Repetition";
+                       agents[i][j].setActionType(2); // Repetition
+                    }
                 }
                 else if(agents[i][j].getIncomeDissimilarity() < wl)
                 {
-                    cout<<"Lastblock"<<endl;
+                    
                     if(agents[i][j].getSatisfaction() == 0)
+                    {
+                       cout<<"Lastblock-optout";
                        agents[i][j].setActionType(1); // Setting for the opt-out
+                    }
                     else
+                    {
+                        cout<<"Lastblock-Imitate";
                        agents[i][j].setActionType(4); //Imitate
+                    }
                 }
 
             }
@@ -1102,16 +1232,16 @@ void Phase7()
 {
     int i,j;
     int year = bioABM::getModelDay()/365;
+    
      for ( i = 0; i < ParameterSet::gridLength; i++) {
             for( j=0; j<ParameterSet::gridWidth;j++){
-
+                
+                
                 if(agents[i][j].getActionType() == 3){
-                    Optimization(i,j,year,agentsinfo[i][j].getgroversbankprofit());
-                   // Imitation(i,j,year,agentsinfo[i][j].getgroversbankprofit());
+                    Optimization(i,j,year,agentsinfo[i][j].getgroversbankprofit(),agentsinfo[i][j].getgroversbankhlbseverity());
                 }
-                else if(agents[i][j].getActionType() == 4)
-                {
-                    Imitation(i,j,year,agentsinfo[i][j].getgroversbankprofit());
+                else if(agents[i][j].getActionType() == 4){
+                    Imitation(i,j,year,agentsinfo[i][j].getgroversbankprofit(),agentsinfo[i][j].getgroversbankhlbseverity());
                 }
             }
      }
@@ -1125,13 +1255,44 @@ void Phase7()
 void writeCSVLine() {
     for (int i = 0; i < ParameterSet::gridLength ; i++) {
         for(int j=0; j<ParameterSet::gridWidth;j++){
+            stringstream pcummulative5yearprofitdata;
+            stringstream pcummulativehlbzero5yearprofitdata;
+            double meanSeverity = getMeanHLB(agents[i][j]);
+            if(bioABM::getModelDay()%365 == 0)
+            {
+                int k;
+                for(k = 0 ;k < totalcountofpreviousdata;k++ )
+                {
+
+                    if(meanSeverity == 0)
+                    {
+                        if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbanknohlbseverityyearcount())
+                        {
+                            pcummulative5yearprofitdata <<pdata[k].getPreviousyearcummulative5yearprofit()<<"~"<<pdata[k].getPreviousyearstratergyname()<<"~"<<pdata[k].getPreviousyearstratergyparameter() <<"##";
+                            pcummulativehlbzero5yearprofitdata <<pdata[k].getPreviousyearcummulative5yearhlbzeroprofit()<<"~"<<pdata[k].getPreviousyearstratergyname()<<"~"<<pdata[k].getPreviousyearstratergyparameter() <<"##";
+                        }
+                    }else
+                    {
+                        if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount())
+                        {
+                            pcummulative5yearprofitdata <<pdata[k].getPreviousyearcummulative5yearprofit()<<"~"<<pdata[k].getPreviousyearstratergyname()<<"~"<<pdata[k].getPreviousyearstratergyparameter() <<"##";
+                            pcummulativehlbzero5yearprofitdata <<pdata[k].getPreviousyearcummulative5yearhlbzeroprofit()<<"~"<<pdata[k].getPreviousyearstratergyname()<<"~"<<pdata[k].getPreviousyearstratergyparameter() <<"##";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                pcummulative5yearprofitdata << "0";
+                pcummulativehlbzero5yearprofitdata << "0";
+            }
              if(agents[i][j].getActionType() != 1){
-                    double meanSeverity = getMeanHLB(agents[i][j]);
+                   
                     stringstream strategyNames;
                     stringstream strategyParams;
                     if (agents[i][j].behaviorPatterns.empty()) {
                         strategyNames << "NoAction";
-                        strategyParams << "NA";
+                        strategyParams << "0;0;0;0;0;0;0";
                     }
                     else {
                         for (int k = 0; k < agents[i][j].behaviorPatterns.size(); k++) {
@@ -1151,21 +1312,45 @@ void writeCSVLine() {
                     outputFile << meanSeverity << ",";
                     outputFile << strategyNames.str() << ",";
                     outputFile << strategyParams.str() << ",";
+                    outputFile << getDeadTrees(agents[i][j])<< ",";
+                    outputFile << agentsinfo[i][j].getgroversbankprofit()<< ",";
                     if(agents[i][j].getActionType() == 1)
                         outputFile <<"Opt-Out"<< ","; 
                     else if(agents[i][j].getActionType() == 2)
                         outputFile <<"Repetition"<< ",";
                     else if(agents[i][j].getActionType() == 3)
                         outputFile <<"optimization"<< ",";
-                    else
+                    else if(agents[i][j].getActionType() == 4)
                         outputFile <<"Imitate"<< ",";
-                    outputFile << experimentID << ","; 
-                    outputFile << getDeadTrees(agents[i][j]) << endl; 
-                     
+                    else
+                        outputFile <<"Repetition"<< ",";
+
+                    outputFile << agents[i][j].getSatisfaction() << ",";
+                    outputFile << agents[i][j].getIncomeDissimilarity() << ",";
+                    if(typeofnetwork == 1)
+                        outputFile<<"Hub&Spoke-"<< grovernetwrokinfo[0][0]<< ",";
+                    else if(typeofnetwork == 2)
+                        outputFile<<"EveryBody"<< ",";
+                    else if(typeofnetwork == 3)
+                        outputFile<<"Neighbours"<< ",";
+                    else
+                        outputFile<<"EveryBody"<< ",";
+                    outputFile << wl << ","; 
+                    outputFile << wh << ",";
+                    outputFile << pcummulative5yearprofitdata.str() << ",";
+                    outputFile << pcummulativehlbzero5yearprofitdata.str() << ",";
+                    outputFile << agentsinfo[0][0].getgroversbankinformation()<< ",";
+                    outputFile << agentsinfo[0][1].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[0][2].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[1][0].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[1][1].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[1][2].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[2][0].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[2][1].getgroversbankinformation()<< ","; 
+                    outputFile << agentsinfo[2][2].getgroversbankinformation()<< endl;  
                 }
                 else
                 {
-                        double meanSeverity = getMeanHLB(agents[i][j]);
                         stringstream strategyNames;
                         stringstream strategyParams;
                         if (agents[i][j].behaviorPatterns.empty()) {
@@ -1187,19 +1372,45 @@ void writeCSVLine() {
                         outputFile << 0 << ",";
                         outputFile << 0 << ",";
                         outputFile << 0 << ",";
-                        outputFile << 0 << ",";
-                        outputFile << "optout" << ",";
+                        outputFile <<meanSeverity<< ",";
+                        outputFile << strategyNames.str() << ",";
                         outputFile << strategyParams.str() << ",";
+                        outputFile << getDeadTrees(agents[i][j]) << ",";
+                        outputFile << 0<< ",";
                         if(agents[i][j].getActionType() == 1)
                             outputFile <<"Opt-Out"<< ","; 
                         else if(agents[i][j].getActionType() == 2)
                             outputFile <<"Repetition"<< ",";
                         else if(agents[i][j].getActionType() == 3)
                             outputFile <<"optimization"<< ",";
-                        else
+                        else if(agents[i][j].getActionType() == 4)
                             outputFile <<"Imitate"<< ",";
-                        outputFile << experimentID << ","; 
-                        outputFile << getDeadTrees(agents[i][j]) << endl;  
+                        else
+                            outputFile <<"Repetition"<< ",";
+
+                        outputFile << agents[i][j].getSatisfaction() << ",";
+                        outputFile << agents[i][j].getIncomeDissimilarity() << ",";
+                        if(typeofnetwork == 1)
+                            outputFile<<"Hub&Spoke-"<< grovernetwrokinfo[0][0]<< ",";
+                        else if(typeofnetwork == 2)
+                            outputFile<<"EveryBody"<< ",";
+                        else if(typeofnetwork == 3)
+                            outputFile<<"Neighbours"<< ",";
+                        else
+                            outputFile<<"EveryBody"<< ",";
+                        outputFile << wl << ","; 
+                        outputFile << wh << ",";
+                        outputFile << pcummulative5yearprofitdata.str() << ",";
+                        outputFile << pcummulativehlbzero5yearprofitdata.str() << ","; 
+                        outputFile << agentsinfo[0][0].getgroversbankinformation()<< ",";
+                        outputFile << agentsinfo[0][1].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[0][2].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[1][0].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[1][1].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[1][2].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[2][0].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[2][1].getgroversbankinformation()<< ","; 
+                        outputFile << agentsinfo[2][2].getgroversbankinformation()<< endl;  
                 }
             }
     }
@@ -1226,8 +1437,6 @@ void runModel() {
               //cout << "Planning period!\n";
             }
 
-       
-             
             // Stage 2: Execution of Planned Actions
             Phase2();
              
@@ -1275,7 +1484,7 @@ void parseParameterFile(string fileName) {
         archive(ParameterSet::planningLength, ParameterSet::freshYield, ParameterSet::juiceYield,
             ParameterSet::freshPrice, ParameterSet::juicePrice, ParameterSet::costs, ParameterSet::biologicalRun,
             ParameterSet::projectionLength, outputFilename, harvestDays, strategyParameters, strategyFlags, agencyFlags, experimentID,agentsbankinfo,
-           memoryvalue,alphaplus,alphaminus,phiplus,phiminus,lambda,referenceincome,wl,wh);
+           memoryvalue,alphaplus,alphaminus,phiplus,phiminus,lambda,referenceincome,wl,wh,typeofnetwork);
     }
     catch (exception e) {
         cout << "ERROR WITH ECON JSON:" << e.what() << endl;
@@ -1336,11 +1545,34 @@ int main(int argc, char ** argv) {
     bioABM::setExperimentID(experimentID);
     outputFile.open(outputFilename);
     outputFile
-        << fixed << "t,id,costs,returns,profit,hlb_severity,strategy_names, strategy_params, experiment_id" << endl;
-    prevdata.ReadPreviousData(pdata);
-    
+        << fixed << "t,id,costs,returns,profit,hlb_severity,strategy_names,strategy_params,RoguedTreecount,AnnualProfit,ActionType,Satisfaction,IncomeDisparity,TypeOfNetwork,Wl,Wh,P5yearcummulativeprofit,P5yearcummulativeHlbzeroprofit,G00Profit,G01Profit,G02Profit,G10Profit,G11Profit,G12Profit,G20Profit,G21Profit,G22Profit" << endl;
+    prevdata.ReadPreviousData(pdata,0);
+
     cropvalue =getCommodity();
     InitialiseCHMA(cropvalue);
+    cout<<"Display the network connection" << endl;
+    if(typeofnetwork == 1)
+    {
+        grovernetwrokinfo.resize(1, std::vector<string>(10));
+        gnw.initializeBonds(grovernetwrokinfo,1,10);
+        gnw.updateBondstypeone(grovernetwrokinfo, 1 ,10 );
+        gnw.displayBonds(grovernetwrokinfo,1,10);
+    }
+    else if(typeofnetwork == 2)
+    {
+        grovernetwrokinfo.resize(9, std::vector<string>(10));
+        gnw.initializeBonds(grovernetwrokinfo,9,10);
+        gnw.updateBondstypetwo(grovernetwrokinfo,9,10);
+        gnw.displayBonds(grovernetwrokinfo,9,10);
+    }
+    else if(typeofnetwork == 3)
+    {
+        grovernetwrokinfo.resize(9, std::vector<string>(10));
+        gnw.initializeBonds(grovernetwrokinfo,9,10);
+        gnw.updateBondstypethree(grovernetwrokinfo,9,10);
+        gnw.displayBonds(grovernetwrokinfo,9,10);
+    }
+
     runModel();
     
     

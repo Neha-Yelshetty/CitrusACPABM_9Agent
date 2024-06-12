@@ -61,6 +61,8 @@ namespace bioABM {
 
     void sprayTrees(double, std::vector<coord>);
 
+    void OTCsprayTrees(double, std::vector<coord>);
+
     bool isValidCoordinate(coord);
 
     void parseParameterFile(std::string);

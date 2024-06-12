@@ -65,7 +65,7 @@ int checkAndRogue(int* ibounds, int* jbounds, int width, int height,double thres
 }
 
 void DensePlanting::PlanActions() {
-
+    cout<<"Hello DensePlanting"<<endl;
     for (int i = 0; i < 365; i++) {
         if (this->notModified) {
             q[i] = true;
@@ -334,6 +334,80 @@ double betaSpread(int relT, double efficacy, string strategy, double alpha) {
     double transformed = 1 / (1 + exp(-1*sum));
     return transformed;
 }
+
+
+/********************************************************
+* OTC : Planaction
+* CURRENTLY DEPRECATED PLANS TO REIMPLEMENT
+********************************************************/
+
+
+void OTC::PlanActions() {
+    //Fill with nulls
+    for (int i = 0; i < 365; i++) {
+        q[i] = false;
+    }
+    //Initialize RNG
+    int target1 = 2;
+    int target2 = 30;
+    int gen_ub = floor(this->windowSize / 2);
+    int gen_lb = -1 * gen_ub;
+    boost::uniform_int<> gen(gen_lb, gen_ub);
+    boost::random::mt19937 econ_rng(std::time(0));
+
+    //Harvest 1
+    int harvest1spray1day = this->start1 + target1;
+    int harvest1spray2day = this->start1 + target2;
+    q[harvest1spray1day] = true;
+    q[harvest1spray2day] = true;
+
+    //Harvest 2
+    int harvest2spray1day = this->start2 + target1;
+    int harvest2spray2day = this->start2 + target2;
+    q[harvest2spray1day] = true;
+    q[harvest2spray2day] = true;
+
+    //Harvest 3
+    int harvest3spray1day = this->start3 + target1;
+    int harvest3spray2day = this->start3 + target2;
+    q[harvest3spray1day] = true;
+    q[harvest3spray2day] = true;
+
+}
+
+
+
+/***************************************************************
+* OTC Spray Grove
+***************************************************************/
+void OTCsprayGrove(int* ibounds, int* jbounds, double efficacy) {
+    vector<boost::tuple<int, int>> coords;
+    for (int i = ibounds[0]; i < ibounds[1]; i++) {
+        for (int j = jbounds[0]; j < jbounds[1]; j++) {
+            coords.push_back(boost::tuple<int, int>(i, j));
+        }
+    }
+    bioABM::OTCsprayTrees(efficacy, coords);
+}
+
+
+/********************************************************
+* OTC : Executaction
+********************************************************/
+
+void OTC::executeAction(Grove *g) {
+    OTCsprayGrove(g->getIBounds(), g->getJBounds(), this->otcefficacy);
+    g->costs += this->otcsprayCost;
+}
+
+
+
+
+
+
+
+
+
 
 /********************************************************
 * No Action : HLB Spread

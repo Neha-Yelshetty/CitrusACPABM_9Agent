@@ -18,7 +18,7 @@
     "adultSurvivalP": 0.9847,
     "nymphMinAgeToInfect": 17,
     "nymphMinAgeToBeInfected": 6,
-    "modelDuration": 3700,
+    "modelDuration": 1200,
     "fileName": "bio_output.csv",
     "initialInfectedPortion": 0.18,
     "initialNumPsyllids": 300,
@@ -32,6 +32,6 @@
     "fallFlushStart": 250,
     "fallFlushEnd": 280,
     "invasionModalities": "5,5",
-    "invasionGrove": 0,
-    "outputFlag": false
+    "invasionGrove": 1,
+    "outputFlag": true
   }
