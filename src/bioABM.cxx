@@ -708,11 +708,12 @@ vector<coord> getGroveBounds(int identifier) {
 /*****************************************************************
 * rogueTreeAt
 ******************************************************************/
-void rogueTreeAt(int i, int j) {
+bool rogueTreeAt(int i, int j) {
     if (isValidCoordinate(coord(i,j))) {
         lattice[i][j].kill();
+        return true;
     }
-    return;
+    return false;
 }
 
 /****************************************************************
@@ -745,69 +746,7 @@ void sprayTrees(double efficacy, vector<coord> locations) {
 ******************************************************************/
 void OTCsprayTrees(double efficacy, vector<coord> locations) {
 
-        int psyllidsRemoved = 0;
-    //cout << "Spraying on day: " << modelDay << " with efficacy " << efficacy << endl;
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < rowLength; j++) {
-            //int r = locations[i].get<0>();
-            //int c = locations[i].get<1>();
-        
-            //int beforePsyllids = lattice[r][c].getTotalPsyllids();
-            lattice[i][j].numPsyllids_male = ceil((1.0 - efficacy) * (double)lattice[i][j].numPsyllids_male);
-            lattice[i][j].numPsyllids_female = ceil((1.0 - efficacy) * (double)lattice[i][j].numPsyllids_female);
-            lattice[i][j].numInfectedPsyllids_male = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedPsyllids_male);
-            lattice[i][j].numInfectedPsyllids_female = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedPsyllids_female);
-            for (int k = 0; k < 17; k++) {
-                lattice[i][j].numNymphs[k] = ceil((1.0 - efficacy) * (double)lattice[i][j].numNymphs[k]);
-                lattice[i][j].numInfectedNymphs[k] = ceil((1.0 - efficacy) * (double)lattice[i][j].numInfectedNymphs[k]);
-            }
-        }
-    }
-        /*int startingMales = lattice[r][c].numPsyllids_male;
-        for (int j = 0; j < startingMales; j++) {
-            if (doubleRand(0, 1) <= efficacy) {
-                lattice[r][c].numPsyllids_male--;
-            }
-        }
-        int startingFemales = lattice[r][c].numPsyllids_female;
-        for (int j = 0; j < startingFemales; j++) {
-            if (doubleRand(0, 1) <= efficacy) {
-                lattice[r][c].numPsyllids_female--;
-            }
-        }
-        int startingMales_i = lattice[r][c].numInfectedPsyllids_male;
-        for (int j = 0; j < startingMales_i; j++) {
-            if (doubleRand(0, 1) <= efficacy) {
-                lattice[r][c].numInfectedPsyllids_male--;
-            }
-        }
-        int startingFemales_i = lattice[r][c].numInfectedPsyllids_female;
-        for (int j = 0; j < lattice[r][c].numInfectedPsyllids_female; j++) {
-            if (doubleRand(0, 1) <= efficacy) {
-                lattice[r][c].numInfectedPsyllids_female--;
-            }
-        }
-        for (int j = 0; j < 17; j++) {
-            int startingNymphs = lattice[r][c].numNymphs[j];
-            for (int k = 0; k < startingNymphs; k++) {
-                if (doubleRand(0, 1) <= efficacy) {
-                    lattice[r][c].numNymphs[j]--;
-                }
-            }
-            int startingNymphs_i = lattice[r][c].numInfectedNymphs[j];
-            for (int k = 0; k < startingNymphs_i; k++) {
-                if (doubleRand(0, 1) <= efficacy) {
-                    lattice[r][c].numInfectedNymphs[j]--;
-                }
-            }
-            //lattice[r][c].numNymphs[j] = ceil((1.0 - efficacy) * (double)lattice[r][c].numNymphs[j]);
-            //lattice[r][c].numInfectedNymphs[j] = ceil((1.0 - efficacy) * (double)lattice[r][c].numInfectedNymphs[j]);
-        }
-        int afterPsyllids = lattice[r][c].getTotalPsyllids();
-        psyllidsRemoved += beforePsyllids - afterPsyllids;*/
-    //}
-    //cout << "Spra
-
+    
 }
 
 

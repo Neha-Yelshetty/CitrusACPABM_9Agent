@@ -57,7 +57,7 @@ namespace bioABM {
 
     typedef boost::tuple<int, int> coord;
     //Functions to interface w/ from economic model
-    void rogueTreeAt(int i, int j);
+    bool rogueTreeAt(int i, int j);
 
     void sprayTrees(double, std::vector<coord>);
 

@@ -267,7 +267,6 @@ void Phase1() {
 * Change the grovers behavior type if the current practice of grover is not profitable
 *************************************************************/
 void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,string changestratergname,double changeprofit,double chnagehlbseverity) {
-
     int period_t = bioABM::getModelDay();
 
    // vector<string> sParams = split(strategyParameters, ";");
@@ -329,10 +328,11 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     }
 
     //Oxytetracycline
-    if (changestratergname == "OTC") {
+    if (changestratergname == "NoActionOTC") {
      stringstream ss;
+     cout<<"Hello :" << sParams[k] << endl;
         ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]);
-     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"OTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"NoActionOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
       Behavior* otc = new OTC(stod(sParams_agent[0]),
                                         stod(sParams_agent[1]),
                                         bioABM::getSpringStart(),
@@ -340,6 +340,31 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
                                         bioABM::getFallStart());
 
         agents[i][j].behaviorPatterns.clear();
+        agents[i][j].behaviorPatterns.push_back(otc); 
+        agents[i][j].behaviorPatterns[0]->PlanActions();
+        
+    }
+
+    if (changestratergname == "SprayTreesOTC") {
+     stringstream ss;
+     
+        ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]) << ";" << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]);
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"SprayTreesOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+      //cout<<stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]) << ";" << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << endl;
+      Behavior* spray = new SprayTrees(stod(sParams_agent[0]),
+                                        stod(sParams_agent[1]),
+                                        bioABM::getSpringStart(),
+                                        bioABM::getSummerStart(),
+                                        bioABM::getFallStart());
+      
+      Behavior* otc = new OTC(stod(sParams_agent[2]),
+                                        stod(sParams_agent[3]),
+                                        bioABM::getSpringStart(),
+                                        bioABM::getSummerStart(),
+                                        bioABM::getFallStart());
+
+        agents[i][j].behaviorPatterns.clear();
+        agents[i][j].behaviorPatterns.push_back(spray); 
         agents[i][j].behaviorPatterns.push_back(otc); 
         agents[i][j].behaviorPatterns[0]->PlanActions();
         
@@ -629,6 +654,9 @@ void Phase5() {
     std::vector<double> current_satisfaction;
     double sum = 0;
     double mean = 0;
+    double severity = 0;
+    double returns = 0;
+    double adjustedReturns = 0;
     
     for (int i = 0; i < ParameterSet::gridLength; i++) {
         for(int j=0; j<ParameterSet::gridWidth;j++){
@@ -656,12 +684,22 @@ void Phase5() {
                             }
                             
                             //Projected severity based on days since initial infection
-                            double severity = bioABM::getSeverityAt(k, l);
+                             severity = bioABM::getSeverityAt(k, l);
+
                             //Yield of crop at projected age
-                            double returns = agents[i][j].getCrop()->getReturns();
+                            returns = agents[i][j].getCrop()->getReturns();
                             
-                            //Infected yield: Units yielded times projected decay
-                            double adjustedReturns = returns * getInfectedYield(severity);
+                            if(agents[i][j].behaviorPatterns[0]->getName().find("OTC") != std::string::npos)
+                            {                                
+                                //Infected yield: Units yielded times projected decay
+                                adjustedReturns = returns * getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
+                            }
+                            else
+                            {                                
+                                //Infected yield: Units yielded times projected decay
+                                adjustedReturns = returns * getInfectedYield(severity);  
+                            }
+
                             agents[i][j].returns += adjustedReturns;
                         // cout<< agents[i][j].getCrop()->getFreshYield();
                         }
@@ -1009,40 +1047,38 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
     double maxamt = 0;
     int highestindex = -1;
     int k = 0;
-    for(k = 0 ;k < totalcountofpreviousdata;k++ )
-    {
-        //cout<<"hlbseverityyearcount:"<<agentsinfo[i][j].getgroversbankhlbseverityyearcount() << endl;
-       // if((pdata[k].getPreviousyeartime() > year && pdata[k].getPreviousyeartime() <= (year+5)) && pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit )
-       if(meanhlbseverity == 0)
-       {
-            if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbanknohlbseverityyearcount() && pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > currentprofit)
-            {
-                if(pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > maxamt )
-                {
+    for (k = 0; k < totalcountofpreviousdata; k++) {
+        if (meanhlbseverity == 0) {
+            if (pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbanknohlbseverityyearcount() &&
+                pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > currentprofit) {
+                if (pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > maxamt &&
+                    pdata[k].getPreviousyearstratergyname().find("OTC") == std::string::npos) { // Select non-OTC values
                     maxamt = pdata[k].getPreviousyearcummulative5yearhlbzeroprofit();
-                    highestindex =k;
+                    highestindex = k;
                 }
-                //cout<<"HLBZero"<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearcummulative5yearhlbzeroprofit()<<"---"<<currentprofit<<endl;
             }
-            if(pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbanknohlbseverityyearcount())
+            if (pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbanknohlbseverityyearcount())
                 break;
-       }
-       else
-       {
-            if(pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() && pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit)
-            {
-                if(pdata[k].getPreviousyearcummulative5yearprofit() > maxamt )
-                {
-                    maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
-                    highestindex =k;
+        } else {
+            if (pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() &&
+                pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit) {
+                if (pdata[k].getPreviousyearcummulative5yearprofit() > maxamt) {
+                    if (meanhlbseverity > 0.003) { // Check if meanhlbseverity > 0.3%
+                        if (pdata[k].getPreviousyearstratergyname().find("OTC") != std::string::npos) { // Select OTC values
+                            maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
+                            highestindex = k;
+                        }
+                    } else { // Otherwise, pick non-OTC values
+
+                        maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
+                        highestindex = k;
+                        
+                    }
                 }
-               // cout<<"Normalmode"<<pdata[k].getpreviousprofitdata()<<"----"<<pdata[k].getPreviousyearcummulative5yearprofit()<<"---"<<currentprofit<<endl;
             }
-            if(pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbankwithhlbseverityyearcount())
+            if (pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbankwithhlbseverityyearcount())
                 break;
-       }
-       
-          
+        }
     }
      if(highestindex != -1)
      {
@@ -1051,10 +1087,11 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
         vector<string> ssparam = split(pdata[highestindex].getPreviousyearstratergyparameter(), ",");
         vector<string> sparamstringVector;
         for (string s: ssparam) {
+            //cout<<s<<":"<<endl;
             sparamstringVector.push_back(s);
         }
         double anualprofit = pdata[highestindex].getPreviousyearcummulative5yearprofit();
-        cout<<"Highest Index"<< i<<"--"<<j<< "~~" << pdata[highestindex].getPreviousyearstratergyparameter()  << "~~" << pdata[highestindex].getPreviousyearstratergyname() <<"~~"<<anualprofit<<"~~"<<currentprofit << endl;
+        //cout<<"Highest Index"<< i<<"--"<<j<< "~~"<<meanhlbseverity<<"~~" << pdata[highestindex].getPreviousyearstratergyparameter()  << "~~" << pdata[highestindex].getPreviousyearstratergyname() <<"~~"<<anualprofit<<"~~"<<currentprofit << endl;
         ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,pdata[highestindex].getPreviousyearstratergyname(),currentprofit,meanhlbseverity); 
         
         
@@ -1083,7 +1120,7 @@ void Imitation(int i, int j,int year,double currentprofit,double meanhlbseverity
             else
                 retrunvalue = gnw.checkbondexists(grovernetwrokinfo,9,10,i,j,k1,k2);
             
-            cout<<"Return value~~"<<i<<"-"<<j<<"-"<<k1<<"-"<<k2<<"-"<<retrunvalue<<endl ;
+            //cout<<"Return value~~"<<i<<"-"<<j<<"-"<<k1<<"-"<<k2<<"-"<<retrunvalue<<endl ;
             //cout<<agentsinfo[k1][k2].getgroversbankprofit() << "~~~~" << currentprofit << endl;
             if(retrunvalue == "Yes")
             {
@@ -1128,7 +1165,7 @@ void Imitation(int i, int j,int year,double currentprofit,double meanhlbseverity
             sparamstringVector.push_back(s);
         }
         //double anualprofit = pdata[highestindex].getPreviousyearannualprofit();
-        cout<<"Highest Index"<< highestindex1<<"--"<<highestindex2<< "~~" << strategyParams.str() << "~~" << strategyNames.str() <<"~~"<<maxamt<<"~~"<<currentprofit << endl;
+        //cout<<"Highest Index"<< highestindex1<<"--"<<highestindex2<< "~~" << strategyParams.str() << "~~" << strategyNames.str() <<"~~"<<maxamt<<"~~"<<currentprofit << endl;
         ChangeGroverBehaviorType(cropvalue,i,j,sparamstringVector,strategyNames.str(),currentprofit,meanhlbseverity);  
      }
         
@@ -1176,7 +1213,7 @@ void Phase6() {
                 else if(wl<= agents[i][j].getIncomeDissimilarity() && agents[i][j].getIncomeDissimilarity()<= wh)
                 {
                     
-                    if(agents[i][j].getSatisfaction() == 0)
+                    if(agents[i][j].getSatisfaction() == 0) 
                     {
                        cout<<"SecondBlock-optimization";
                        agents[i][j].setActionType(3); // optimization

@@ -47,8 +47,8 @@ int checkAndRogue(int* ibounds, int* jbounds, int width, int height,double thres
                     for (int l = -width; l <= width; l++) {
                         if (bioABM::isTreeAlive(i+k,j+l)) {
                            // cout<< "condition2" << endl;
-                            bioABM::rogueTreeAt(i+k,j+l);
-                            removalCount++;
+                            if(bioABM::rogueTreeAt(i+k,j+l))
+                                removalCount++;
                         }
                     }
                 }
@@ -104,7 +104,7 @@ void RogueTrees::PlanActions() {
         q[i] = false;
     }
     //Check once at start of year, and every frequency days after
-    int daysPerSurvey = 365 / this->frequency;
+    int daysPerSurvey = this->frequency;
     for (int i = 0; i < 365; i += daysPerSurvey) {
         q[i] = true;
     }

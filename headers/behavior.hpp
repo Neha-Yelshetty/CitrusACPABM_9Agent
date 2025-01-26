@@ -28,7 +28,7 @@ public:
 
     //Returns the variable costs of behavior per planning period
     virtual double getVariableCosts() = 0;
-
+    virtual double getotcefficacy() = 0;
     virtual void executeAction(Grove *g) = 0;
     virtual string getName() = 0;
     virtual string getParams() = 0;
@@ -57,6 +57,7 @@ public:
     }
     void PlanActions();
     double getVariableCosts() { return annualCosts; }
+    double getotcefficacy()  { return 0; }
     double hlbSpread(int t, Grove *g) { return 0; }
     void executeAction(Grove *g);
     string getName() { return "DensePlanting"; }
@@ -98,6 +99,7 @@ public:
 
     //Unused and incorrect
     double getVariableCosts() { return this->removalCost; }
+    double getotcefficacy()  { return 0; }
     string getName() { return "RogueTrees"; }
     string getParams() { 
         stringstream ss;
@@ -141,6 +143,7 @@ public:
 
     //Unused and incorrect
     double getVariableCosts() { return this->removalCost; }
+    double getotcefficacy()  { return 0; }
     string getName() { return "RectangularRogue"; }
     string getParams() { 
         stringstream ss;
@@ -182,6 +185,7 @@ class SprayTrees: public Behavior {
 
         //Returns the variable costs per year
         double getVariableCosts() { return this->sprayCost; }
+        double getotcefficacy()  { return 0; }
         string getName() { return "SprayTrees"; }
         string getParams() { 
             stringstream ss;
@@ -223,6 +227,7 @@ class OTC: public Behavior {
 
         //Returns the variable costs per year
         double getVariableCosts() { return this->otcsprayCost; }
+        double getotcefficacy() { return this->otcefficacy; }
         string getName() { return "OTC"; }
         string getParams() { 
             stringstream ss;
