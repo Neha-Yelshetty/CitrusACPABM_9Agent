@@ -214,32 +214,44 @@ def appendMasterTriples(cnx, econ, biocons, folder, master, numSets=0, nameSuffi
 #                 yield multiplier, removalcost, surveycost, frequency, width, height
 #SPRAY TEST
 #for x in range(0,100):
-#	for e in [600,700,800,900]:
-#		econ_copy = copy.deepcopy(econConfig)
-#		econ_copy["strategyFlags"] = "0,1,0,0"
-#		econ_copy["strategyParameters"] = f"5,5,0,0,0.1,{e/1000},0.246,5,0"
-#		appendMasterTriples(cnx_a, econ_copy, configList, f"sprayVariations",  masterConfigList, numSets=1)
+#for e in [600,700,800,900]:
+#    for wlp in [-0.1,0.1,0.0]:
+#        for whp in [0.2,0.1,0.000309965]:
+#              econ_copy = copy.deepcopy(econConfig)
+#              econ_copy["strategyFlags"] = "0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0;0,1,0,0"
+#              econ_copy["strategyParameters"] = f"5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0;5,5,0,0,0.1,{e/1000},0.246,5,0"
+#              econ_copy["wl"] = wlp
+#              econ_copy["wh"] = whp
+#              appendMasterTriples(cnx_a, econ_copy, configList, f"sprayVariations",  masterConfigList, numSets=1)
 # # # #ROGUE TEST
-for x in range(0,1):
-	for radius in [0]: #20,40,60
-		for frequency in [45,70,105,135]: #1,6,12,18,24
-			for cost in [0]: #3,6,9
-				for thershold in [0.1,0.2,0.3,0.4,0.5]:
-					econ_copy = copy.deepcopy(econConfig)
-					econ_copy["strategyFlags"] = "1,0,0,0"
-					econ_copy["strategyParameters"] = f"{cost},0.25,{frequency},{radius},{thershold},0,5,5,0"
-					appendMasterTriples(cnx_a, econ_copy, configList, f"rogueVariations", masterConfigList, numSets=1)
+#for x in range(0,1):
+#	for radius in [0]: #20,40,60
+#		for frequency in [15,45,70,105,135,175]: #1,6,12,18,24
+#			for cost in [0]: #3,6,9
+#				for thershold in [0.1,0.2,0.15,0.05,0.25,0.3,0.35,0.4,0.45,0.5,0.75]:
+#					for wlp in [-0.1,0.1,0.0]:
+#						for whp in [0.2,0.1,0.000309965]:
+#							econ_copy = copy.deepcopy(econConfig)
+#							econ_copy["strategyFlags"] = "1,0,0,0;1,0,0,0;1,0,0,0;1,0,0,0;1,0,0,0;1,0,0,0;1,0,0,0;1,0,0,0"
+#							econ_copy["strategyParameters"] = f"{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0;{cost},0.25,{frequency},{radius},{thershold},0,5,5,0"
+#							econ_copy["wl"] = wlp
+#							econ_copy["wh"] = whp
+#							appendMasterTriples(cnx_a, econ_copy, configList, f"rogueVariations", masterConfigList, numSets=1)
 # # # # #SPRAY AND ROGUE
-#for x in range(0,10):
-#	for e in [600,700,800,900]:
-#		for frequency in [45,70,105,135]: #1,6,12,18,24
-#			for radius in [0]: #1,8,10,20,40
-#				for cost in [0]: #3,6,9
-#					for thershold in [0.1,0.2,0.3,0.4,0.5]:
-#						econ_copy = copy.deepcopy(econConfig)
-#						econ_copy["strategyFlags"] = "1,1,0,0"
-#						econ_copy["strategyParameters"] = f"{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0"
-#						appendMasterTriples(cnx_a, econ_copy, configList, f"rogueSprayVariations", masterConfigList, numSets=1)
+for x in range(0,1):
+	for e in [600,700,800,900]:
+		for frequency in [15,45,70,105,135,175]: #1,6,12,18,24
+			for radius in [0]: #1,8,10,20,40
+				for cost in [0]: #3,6,9
+					for thershold in [0.1,0.2,0.15,0.05,0.25,0.3,0.35,0.4,0.45,0.5,0.75]:
+						for wlp in [-0.1,0.1,0.0]:
+							for whp in [0.2,0.1,0.000309965]:
+								econ_copy = copy.deepcopy(econConfig)
+								econ_copy["strategyFlags"] = "1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0;1,1,0,0"
+								econ_copy["strategyParameters"] = f"{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0;{cost},0.25,{frequency},{radius},{thershold},{e/1000},0.246,5,0"
+								econ_copy["wl"] = wlp
+								econ_copy["wh"] = whp
+								appendMasterTriples(cnx_a, econ_copy, configList, f"rogueSprayVariations", masterConfigList, numSets=1)
 
 
 # RECTANGULAR ROGUE
@@ -352,10 +364,15 @@ for x in range(0,1):
 #                 appendMasterTriples(cnx_a, econ_copy, configList, f"denseRogueSprayVariations", masterConfigList, numSets=1)
 # #NO ACTION BASELINE
 #for x in range(0,100):
-#	econ_copy = copy.deepcopy(econConfig)
-#	econ_copy["strategyFlags"] = "0,0,0,0"
-#	econ_copy["strategyParameters"] = f"0,0,0,0,0,0,0,0"
-#	appendMasterTriples(cnx_a, econ_copy, configList, f"noAction_baseCase",  masterConfigList, numSets=1)
+#for wlp in [-0.1,0.1,0.0]:
+#	for whp in [0.2,0.1,0.000309965]:
+#		econ_copy = copy.deepcopy(econConfig)
+#		econ_copy["strategyFlags"] = "0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0;0,0,0,0"
+#		econ_copy["strategyParameters"] = f"0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0"
+#		econ_copy["wl"] = wlp
+#		econ_copy["wh"] = whp
+#		appendMasterTriples(cnx_a, econ_copy, configList, f"noAction_baseCase",  masterConfigList, numSets=1)
+
 
 def runInstance(config):
     biofileName = config[1]["fileName"][:-4]
@@ -404,3 +421,6 @@ for config in tqdm.tqdm(revisedMaster):
 
 
 cnx_a.close()
+
+
+
