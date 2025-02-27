@@ -14,7 +14,7 @@
   "agencyFlags":"1",
   "experimentID": -1,
   "agentsbankinfo":"0,0;1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0",
-  "memoryvalue": 5000,
+  "memoryvalue": 2250,
   "alphaplus": 7, 
   "alphaminus": 1,
   "phiplus":0.9,
