@@ -33,5 +33,5 @@
   "fallFlushEnd": 280,
   "invasionModalities": "3,3",
   "invasionGrove": 1,
-  "outputFlag": true
+  "outputFlag": false
 }
