@@ -129,10 +129,10 @@ void InitialiseCHMA(Commodity crop) {
     vector<string> agencyParams = split(agencyFlags, ";");
     vector<string> sagentsbankinfo = split(agentsbankinfo,";");
    
-    int latticeRows = bioABM::getNumRows();
-    int latticeCols = bioABM::getRowLength();
-    int cropRowSize = latticeRows / ParameterSet::gridLength;
-    int cropColSize = latticeCols / ParameterSet::gridWidth;
+    int latticeRows = bioABM::getNumRows(); //75
+    int latticeCols = bioABM::getRowLength(); //33
+    int cropRowSize = latticeRows / ParameterSet::gridLength;  // 25
+    int cropColSize = latticeCols / ParameterSet::gridWidth;  // 11
     int k =0;   
     for (int i = 0; i < ParameterSet::gridLength; i++) {
 

@@ -59,7 +59,7 @@ namespace bioABM {
     //Functions to interface w/ from economic model
     bool rogueTreeAt(int i, int j);
 
-    void sprayTrees(double, std::vector<coord>);
+    void sprayTrees(double, int*,int*);
 
     void OTCsprayTrees(double, std::vector<coord>);
 

@@ -69,8 +69,8 @@ int hlbseverityon = false;
 //11 * 25 - for one grover
 const int rowLength = 33; //11
 const int numRows = 75; //25
-const int hBorders = 0;
-const int vBorders = 0;
+const int hBorders = 2;
+const int vBorders = 2;
 int count = 0;
 
 #pragma endregion
@@ -676,19 +676,19 @@ void initializeLattice() {
 * Bounds are lower inclusive, upper exclusive
 ****************************************************/
 vector<coord> getGroveBounds(int identifier) {
-    int rowID = identifier / 10;
-    int colID = identifier % 10;
+    int rowID = identifier / 3;
+    int colID = identifier % 3;
     
     //First row bounds
     int gamma_r = numRows / (hBorders + 1);
-    int rowLB = gamma_r * rowID;
-    int rowUB = gamma_r * (rowID + 1);
+    int rowLB = (gamma_r * colID);
+    int rowUB = (gamma_r + rowLB);
     coord rowBounds(rowLB, rowUB);
 
     //Same for column
     int gamma_c = rowLength / (vBorders + 1);
-    int colLB = gamma_c * colID;
-    int colUB = gamma_c * (colID + 1);
+    int colLB = gamma_c * rowID;
+    int colUB = gamma_c + colLB;
     coord colBounds(colLB, colUB);
 
     //Package and return
@@ -719,11 +719,11 @@ bool rogueTreeAt(int i, int j) {
 /****************************************************************
 * Spray trees
 ******************************************************************/
-void sprayTrees(double efficacy, vector<coord> locations) {
+void sprayTrees(double efficacy,int* ibounds, int* jbounds) {
     int psyllidsRemoved = 0;
     //cout << "Spraying on day: " << modelDay << " with efficacy " << efficacy << endl;
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < rowLength; j++) {
+    for (int i = ibounds[0]; i < ibounds[1]; i++) {
+        for (int j = jbounds[0]; j < jbounds[1]; j++) {
             //int r = locations[i].get<0>();
             //int c = locations[i].get<1>();
         

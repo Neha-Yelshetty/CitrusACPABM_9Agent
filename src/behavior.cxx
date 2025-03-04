@@ -21,7 +21,7 @@ void sprayGrove(int* ibounds, int* jbounds, double efficacy) {
             coords.push_back(boost::tuple<int, int>(i, j));
         }
     }
-    bioABM::sprayTrees(efficacy, coords);
+    bioABM::sprayTrees(efficacy,ibounds,jbounds);
 }
 
 /****************************************************************
