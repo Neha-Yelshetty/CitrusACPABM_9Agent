@@ -1201,12 +1201,12 @@ void Phase6() {
                 {
                     if(agents[i][j].getSatisfaction() == 0)
                     {
-                       cout<<"Firstblock-OptOut";
+                      //cout<<"Firstblock-OptOut";
                        agents[i][j].setActionType(1); // Setting for the opt-out
                     }
                     else
                     {
-                      cout<<"Repetition";
+                      //cout<<"Repetition";
                        agents[i][j].setActionType(2); //Repetition
                     }
                 }
@@ -1215,12 +1215,12 @@ void Phase6() {
                     
                     if(agents[i][j].getSatisfaction() == 0) 
                     {
-                       cout<<"SecondBlock-optimization";
+                       //cout<<"SecondBlock-optimization";
                        agents[i][j].setActionType(3); // optimization
                     }
                     else
                     {
-                      cout<<"SecondBlock-Repetition";
+                      //cout<<"SecondBlock-Repetition";
                        agents[i][j].setActionType(2); // Repetition
                     }
                 }
@@ -1229,12 +1229,12 @@ void Phase6() {
                     
                     if(agents[i][j].getSatisfaction() == 0)
                     {
-                       cout<<"Lastblock-optout";
+                       //cout<<"Lastblock-optout";
                        agents[i][j].setActionType(1); // Setting for the opt-out
                     }
                     else
                     {
-                        cout<<"Lastblock-Imitate";
+                        //cout<<"Lastblock-Imitate";
                        agents[i][j].setActionType(4); //Imitate
                     }
                 }
@@ -1256,7 +1256,7 @@ void Phase6() {
                 }
             }
 
-            cout<< i << "~~" << j <<"~~"<<wl<<"~~"<<wh<<"~~" << agents[i][j].getIncomeDissimilarity()<<"~~"<<agents[i][j].getSatisfaction()<<"~~"<<strategyNames.str()<<"~~"<< strategyParams.str()<<"~~"<<agentsinfo[i][j].getgroversbankprofit()<<endl;
+            //cout<< i << "~~" << j <<"~~"<<wl<<"~~"<<wh<<"~~" << agents[i][j].getIncomeDissimilarity()<<"~~"<<agents[i][j].getSatisfaction()<<"~~"<<strategyNames.str()<<"~~"<< strategyParams.str()<<"~~"<<agentsinfo[i][j].getgroversbankprofit()<<endl;
            }
 
         }
@@ -1587,27 +1587,27 @@ int main(int argc, char ** argv) {
 
     cropvalue =getCommodity();
     InitialiseCHMA(cropvalue);
-    cout<<"Display the network connection" << endl;
+    //cout<<"Display the network connection" << endl;
     if(typeofnetwork == 1)
     {
         grovernetwrokinfo.resize(1, std::vector<string>(10));
         gnw.initializeBonds(grovernetwrokinfo,1,10);
         gnw.updateBondstypeone(grovernetwrokinfo, 1 ,10 );
-        gnw.displayBonds(grovernetwrokinfo,1,10);
+        //gnw.displayBonds(grovernetwrokinfo,1,10);
     }
     else if(typeofnetwork == 2)
     {
         grovernetwrokinfo.resize(9, std::vector<string>(10));
         gnw.initializeBonds(grovernetwrokinfo,9,10);
         gnw.updateBondstypetwo(grovernetwrokinfo,9,10);
-        gnw.displayBonds(grovernetwrokinfo,9,10);
+        //gnw.displayBonds(grovernetwrokinfo,9,10);
     }
     else if(typeofnetwork == 3)
     {
         grovernetwrokinfo.resize(9, std::vector<string>(10));
         gnw.initializeBonds(grovernetwrokinfo,9,10);
         gnw.updateBondstypethree(grovernetwrokinfo,9,10);
-        gnw.displayBonds(grovernetwrokinfo,9,10);
+        //gnw.displayBonds(grovernetwrokinfo,9,10);
     }
 
     runModel();
