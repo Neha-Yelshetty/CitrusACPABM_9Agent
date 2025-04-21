@@ -44,7 +44,7 @@ void previousyearprofitdata::ReadPreviousData(previousyearprofitdata pdata[],int
     //if(pdata[0].getPreviousyeartime() != currentyear)
     //{
         ifstream inFile;
-        inFile.open("./YearlyProfit_NA_SP_RG_RS/YearlyProfit_NA_SP_RG_RS_OTC.csv");
+        inFile.open("./YearlyProfit_NA_SP_RG_RS/YearlyProfit_NA_SP_RG_RS_OTC_NOZeroHLB.csv");
 
         std::vector<std::string> tokens;
         std::string token;
@@ -63,7 +63,7 @@ void previousyearprofitdata::ReadPreviousData(previousyearprofitdata pdata[],int
             if(tokens[0] != "t")
             {
                 int y = stoi(tokens[0])/365;
-                pdata[i].setPreviousyearprofitdata(stoi(tokens[0])/365,stod(tokens[1]),stod(tokens[4]),tokens[2],tokens[3],stod(tokens[5]),stod(tokens[6]),stod(tokens[7]));
+                pdata[i].setPreviousyearprofitdata(stoi(tokens[0])/365,stod(tokens[1]),stod(tokens[4]),tokens[2],tokens[3],stod(tokens[5]),0,0);
                 i++;
             }
             

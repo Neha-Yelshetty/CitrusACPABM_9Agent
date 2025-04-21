@@ -1,6 +1,6 @@
 {
   "planningLength": 91,
-  "freshYield": 5.5,
+  "freshYield": 0.84097859,
   "juiceYield": 0.0,
   "freshPrice": 17.80, 
   "juicePrice": 0.0,
@@ -15,13 +15,13 @@
   "experimentID": -1,
   "agentsbankinfo":"0,0;1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0",
   "memoryvalue": 2250,
-  "alphaplus": 0.6, 
-  "alphaminus": 0.6,
-  "phiplus":0.7,
+  "alphaplus": 0.5, 
+  "alphaminus": 0.6, 
+  "phiplus":0.6, 
   "phiminus":0.7,
   "lambda": 0.7,
-  "referenceincome":1000,
-  "wl":-0.2,
-  "wh":5,
+  "referenceincome":2250, 
+  "wl":-0.09, 
+  "wh":0.09,  
   "typeofnetwork":2
 }

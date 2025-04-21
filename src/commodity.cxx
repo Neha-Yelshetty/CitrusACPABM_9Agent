@@ -38,6 +38,7 @@ Commodity::Commodity(double freshYield, double juiceYield, double freshPrice, do
     this->freshPrice = freshPrice;
     this->juicePrice = juicePrice;
     this->costs = costs;
+    setVariableCost(costs);
 }
 
 double Commodity::getReturns() {

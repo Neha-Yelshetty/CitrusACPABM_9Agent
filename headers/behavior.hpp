@@ -30,7 +30,7 @@ public:
     virtual double getVariableCosts() = 0;
     virtual double getotcefficacy() = 0;
     virtual void executeAction(Grove *g) = 0;
-    virtual string getName() = 0;
+    virtual std::string getName() { return "Noaction"; }
     virtual string getParams() = 0;
 
     bool actionPlannedOnDay(int day) {
@@ -60,7 +60,7 @@ public:
     double getotcefficacy()  { return 0; }
     double hlbSpread(int t, Grove *g) { return 0; }
     void executeAction(Grove *g);
-    string getName() { return "DensePlanting"; }
+    string getName() override { return "DensePlanting"; }
     string getParams() {
         stringstream ss;
         ss << annualCosts << ";" << yieldMultiplier;
@@ -100,7 +100,7 @@ public:
     //Unused and incorrect
     double getVariableCosts() { return this->removalCost; }
     double getotcefficacy()  { return 0; }
-    string getName() { return "RogueTrees"; }
+    string getName() override { return "RogueTrees"; }
     string getParams() { 
         stringstream ss;
         ss << frequency << ";" << radius << ";" << removalCost << ";" << surveyCost <<";"<<thresholdseverity;
@@ -144,7 +144,7 @@ public:
     //Unused and incorrect
     double getVariableCosts() { return this->removalCost; }
     double getotcefficacy()  { return 0; }
-    string getName() { return "RectangularRogue"; }
+    string getName() override { return "RectangularRogue"; }
     string getParams() { 
         stringstream ss;
         ss << frequency << ";" << width << ";" << height << ";" << removalCost << ";" << surveyCost<<";"<<thresholdseverity;
@@ -186,7 +186,7 @@ class SprayTrees: public Behavior {
         //Returns the variable costs per year
         double getVariableCosts() { return this->sprayCost; }
         double getotcefficacy()  { return 0; }
-        string getName() { return "SprayTrees"; }
+        string getName() override { return "SprayTrees"; }
         string getParams() { 
             stringstream ss;
             ss << efficacy << ";" << sprayCost;
@@ -228,7 +228,7 @@ class OTC: public Behavior {
         //Returns the variable costs per year
         double getVariableCosts() { return this->otcsprayCost; }
         double getotcefficacy() { return this->otcefficacy; }
-        string getName() { return "OTC"; }
+        string getName() override { return "OTC"; }
         string getParams() { 
             stringstream ss;
             ss << otcefficacy << ";" << otcsprayCost;
