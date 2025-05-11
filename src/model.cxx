@@ -667,15 +667,16 @@ void Phase5() {
 
                 if (rel_t == 0) {
                     //VC
-                    //agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost();
+                    agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost(); 
                     //FC
                     //agents[i][j].costs += agents[i][j].getFixedCosts();
-                    agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
+                    //agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
                 }
                 
+                 
                 //Harvest
                 if (agents[i][j].getCrop()->isHarvestPeriod(rel_t)) {
-                    
+                    //cout<<i<<"~~"<<j<<agents[i][j].behaviorPatterns[0]->getName()<<endl;
                     for (int k = ibounds[0]; k < ibounds[1]; k++) {
                         for (int l = jbounds[0]; l < jbounds[1]; l++) {
                             //No yield if tree is dead
@@ -687,9 +688,9 @@ void Phase5() {
                              severity = bioABM::getSeverityAt(k, l);
 
                             //Yield of crop at projected age
-                            returns = agents[i][j].getCrop()->getReturns();
+                            returns = numCrops * agents[i][j].getCrop()->getReturns();
                             
-                            if(agents[i][j].behaviorPatterns[0]->getName().find("OTC") != std::string::npos)
+                            if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[0]->getName().find("OTC") != std::string::npos)
                             {                                
                                 //Infected yield: Units yielded times projected decay
                                 adjustedReturns = returns * getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
@@ -699,6 +700,7 @@ void Phase5() {
                                 //Infected yield: Units yielded times projected decay
                                 adjustedReturns = returns * getInfectedYield(severity);  
                             }
+
 
                             agents[i][j].returns += adjustedReturns;
                         // cout<< agents[i][j].getCrop()->getFreshYield();
@@ -722,7 +724,7 @@ void Phase5() {
         }
         agentsinfo[i][j].setgroverbankparameters((agents[i][j].returns - agents[i][j].costs),meanSeverity,strategyNames.str());*/
 
-            
+           
             if(rel_t == 0)
             {
                 int hlbyearcount = 0;
@@ -739,12 +741,18 @@ void Phase5() {
                 //cout<<"ishlbseverityexists:"<<rel_t<<"~~"<<meanSeverity<<"~~"<<agentsinfo[i][j].getgroversbankwithhlbseverityyearcount()<<"~~"<<agentsinfo[i][j].getgroversbanknohlbseverityyearcount()<<endl;
             }
             
-
+             
              if(agents[i][j].behaviorPatterns.empty())
+             {
+                //cout<<"ifblock"<<endl;
                 agentsinfo[i][j].setgroverbankparameters((agents[i][j].returns - agents[i][j].costs),meanSeverity, "NoAction");
+             }
              else
+             {
+                //cout<<"elseblock"<<(agents[i][j].returns - agents[i][j].costs)<<meanSeverity<<endl;
                 agentsinfo[i][j].setgroverbankparameters((agents[i][j].returns - agents[i][j].costs),meanSeverity, agents[i][j].behaviorPatterns[0]->getName());
-
+             }
+            //cout<<"done with the condition"<<endl;
        
 
        
@@ -765,7 +773,9 @@ void Phase5() {
 
         }
      }
+    
     }
+     //cout<<"end of the phase5"<<endl;
     // DEPRECATED
     
    /* for (int i = 0; i < ParameterSet::gridLength; i++) {
@@ -856,6 +866,7 @@ double calculateSatisfaction(double income, double probability, double probdelta
 		double phi = 0;
        // cout << income <<"--" << probability << "--" <<probdeltapos <<"--"<<probdeltaneg << endl;
 		if (income >= referenceincome) {
+            cout<<"hellio";
 			value = pow(income, alphaplus);
 			probability = 1-probability;
 			probWeighting = ( pow(probability, phiplus) ) / pow( (pow(probability, phiplus) + pow((1 - probability), phiplus)), (1/phiplus) );
@@ -879,7 +890,7 @@ double calculateSatisfaction(double income, double probability, double probdelta
 
 		satisfaction = value*phi;
 
-        //cout<<income<<"~"<<referenceincome<<"~"<<value<<"~"<<phiplus<<"~"<<phi<<"~"<<satisfaction<<endl;
+        cout<<income<<"~"<<referenceincome<<"~"<<value<<"~"<<phi<<"~"<<satisfaction<<endl;
 
 		return satisfaction; //satisfaction
  
@@ -912,6 +923,7 @@ void calcuatesatisfaction(int i,int j)
 
 
     double meanSatisfaction = std::accumulate(current_satisfaction.begin(), current_satisfaction.end(), 0.0);
+    cout<<meanSatisfaction<<endl;
     if(meanSatisfaction > 0)
       agents[i][j].setSatisfaction(1); //1
     else
@@ -1048,7 +1060,7 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
     int highestindex = -1;
     int k = 0;
     for (k = 0; k < totalcountofpreviousdata; k++) {
-        if (meanhlbseverity == 0) {
+       /* if (meanhlbseverity == 0) {
             if (pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbanknohlbseverityyearcount() &&
                 pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > currentprofit) {
                 if (pdata[k].getPreviousyearcummulative5yearhlbzeroprofit() > maxamt &&
@@ -1059,7 +1071,7 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
             }
             if (pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbanknohlbseverityyearcount())
                 break;
-        } else {
+        } else {*/
             if (pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() &&
                 pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit) {
                 if (pdata[k].getPreviousyearcummulative5yearprofit() > maxamt) {
@@ -1078,7 +1090,7 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
             }
             if (pdata[k].getPreviousyeartime() > agentsinfo[i][j].getgroversbankwithhlbseverityyearcount())
                 break;
-        }
+       // }
     }
      if(highestindex != -1)
      {
@@ -1466,41 +1478,50 @@ void runModel() {
     
     while (bioABM::getModelDay() <= bioABM::getModelDuration()) {
         // Stage 1: Psyllid Growth and Movement
+        //cout<<"Before 1" << bioABM::getModelDay() <<endl;
         Phase1();
-             
+        
         //cout << "Period " << bioABM::getModelDay() << endl;
         if (!ParameterSet::biologicalRun) {
             if (bioABM::getModelDay() % ParameterSet::planningLength == 0) {
               //cout << "Planning period!\n";
             }
 
+            //cout<<"Before 2" << bioABM::getModelDay() <<endl;
             // Stage 2: Execution of Planned Actions
             Phase2();
+            
              
             // Stage 3: Behavior determination
             //Phase3();
-
+            //cout<<"Before 4" << bioABM::getModelDay() <<endl;
             //Stage 4: Planning
             Phase4();
            
 
+            //cout<<"Before 5" << bioABM::getModelDay() <<endl;
             //Stage 5: Accounting
             Phase5();
             
             if((bioABM::getModelDay()%365) == 0)
             {
-                
+                 //cout<<"Before 6" << bioABM::getModelDay() <<endl;
                 //Stage 6: Grovers Prediciton of Surrouding
                 Phase6();
 
+                 //cout<<"Before 7" << bioABM::getModelDay() <<endl;
                 //Stage 7: Work on the Optimization,Imitation
                 Phase7();
 
                 //cout<< bioABM::getModelDay()<<endl;
                 
             }
-             
+
+            //cout<<"Before writeline" << bioABM::getModelDay() <<endl;
             writeCSVLine();
+
+            //cout<<"Hello" << bioABM::getModelDay() <<endl;
+            //std::cin.get();
         }
         
     }
@@ -1561,7 +1582,6 @@ int main(int argc, char ** argv) {
     bioABM::parseParameterFile(bioConfigFile);
 
 
-
     // Set up the behavior patterns, parameters arent used
     //IndividualAction individualSpray = IndividualAction(60, ParameterSet::sprayCost, ParameterSet::planningLength);
     
@@ -1583,10 +1603,12 @@ int main(int argc, char ** argv) {
     outputFile.open(outputFilename);
     outputFile
         << fixed << "t,id,costs,returns,profit,hlb_severity,strategy_names,strategy_params,RoguedTreecount,AnnualProfit,ActionType,Satisfaction,IncomeDisparity,TypeOfNetwork,Wl,Wh,P5yearcummulativeprofit,P5yearcummulativeHlbzeroprofit,G00Profit,G01Profit,G02Profit,G10Profit,G11Profit,G12Profit,G20Profit,G21Profit,G22Profit" << endl;
-    prevdata.ReadPreviousData(pdata,0);
 
+    prevdata.ReadPreviousData(pdata,0);
     cropvalue =getCommodity();
     InitialiseCHMA(cropvalue);
+
+
     //cout<<"Display the network connection" << endl;
     if(typeofnetwork == 1)
     {
@@ -1595,7 +1617,7 @@ int main(int argc, char ** argv) {
         gnw.updateBondstypeone(grovernetwrokinfo, 1 ,10 );
         //gnw.displayBonds(grovernetwrokinfo,1,10);
     }
-    else if(typeofnetwork == 2)
+    else if(typeofnetwork == 2) 
     {
         grovernetwrokinfo.resize(9, std::vector<string>(10));
         gnw.initializeBonds(grovernetwrokinfo,9,10);
@@ -1612,6 +1634,7 @@ int main(int argc, char ** argv) {
 
     runModel();
     
+
     
 
     return 0;
