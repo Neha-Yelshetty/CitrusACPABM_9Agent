@@ -864,9 +864,9 @@ double calculateSatisfaction(double income, double probability, double probdelta
 		double probWeightingdelta = 0;
 		
 		double phi = 0;
-       // cout << income <<"--" << probability << "--" <<probdeltapos <<"--"<<probdeltaneg << endl;
+        //cout <<referenceincome <<"---"<< double(income) <<"--" << probability << "--" <<probdeltapos <<"--"<<probdeltaneg << endl;
 		if (income >= referenceincome) {
-            cout<<"hellio";
+            //cout<<"income more"<<endl;
 			value = pow(income, alphaplus);
 			probability = 1-probability;
 			probWeighting = ( pow(probability, phiplus) ) / pow( (pow(probability, phiplus) + pow((1 - probability), phiplus)), (1/phiplus) );
@@ -878,6 +878,7 @@ double calculateSatisfaction(double income, double probability, double probdelta
             
 		} 
 		else {
+            //cout<<"Income less"<<endl;
 			value = (-1)*lambda* pow(income, alphaminus);
 			
 			probWeighting = ( pow(probability, phiminus) ) / pow( (pow(probability, phiminus) + pow((1 - probability), phiminus)), (1/phiminus) );
@@ -890,7 +891,7 @@ double calculateSatisfaction(double income, double probability, double probdelta
 
 		satisfaction = value*phi;
 
-        cout<<income<<"~"<<referenceincome<<"~"<<value<<"~"<<phi<<"~"<<satisfaction<<endl;
+        //cout<<income<<"~"<<referenceincome<<"~"<<value<<"~"<<phi<<"~"<<satisfaction<<endl;
 
 		return satisfaction; //satisfaction
  
@@ -1121,7 +1122,6 @@ void Imitation(int i, int j,int year,double currentprofit,double meanhlbseverity
     int highestindex1 = -1,highestindex2 = -1;
     int k1,k2 = 0;
     string retrunvalue = "No";
-    cout<<"Inside imitate"<<endl;
     for ( k1 = 0; k1 < ParameterSet::gridLength; k1++) {
         for( k2=0; k2<ParameterSet::gridWidth;k2++){
 
@@ -1213,12 +1213,12 @@ void Phase6() {
                 {
                     if(agents[i][j].getSatisfaction() == 0)
                     {
-                      //cout<<"Firstblock-OptOut";
+                      cout<<"Firstblock-OptOut";
                        agents[i][j].setActionType(1); // Setting for the opt-out
                     }
                     else
                     {
-                      //cout<<"Repetition";
+                      cout<<"Firstblock-Repetition";
                        agents[i][j].setActionType(2); //Repetition
                     }
                 }
@@ -1227,12 +1227,12 @@ void Phase6() {
                     
                     if(agents[i][j].getSatisfaction() == 0) 
                     {
-                       //cout<<"SecondBlock-optimization";
+                       cout<<"SecondBlock-optimization";
                        agents[i][j].setActionType(3); // optimization
                     }
                     else
                     {
-                      //cout<<"SecondBlock-Repetition";
+                      cout<<"SecondBlock-Repetition";
                        agents[i][j].setActionType(2); // Repetition
                     }
                 }
@@ -1241,12 +1241,12 @@ void Phase6() {
                     
                     if(agents[i][j].getSatisfaction() == 0)
                     {
-                       //cout<<"Lastblock-optout";
+                       cout<<"Lastblock-optout";
                        agents[i][j].setActionType(1); // Setting for the opt-out
                     }
                     else
                     {
-                        //cout<<"Lastblock-Imitate";
+                        cout<<"Lastblock-Imitate";
                        agents[i][j].setActionType(4); //Imitate
                     }
                 }
@@ -1268,7 +1268,7 @@ void Phase6() {
                 }
             }
 
-            //cout<< i << "~~" << j <<"~~"<<wl<<"~~"<<wh<<"~~" << agents[i][j].getIncomeDissimilarity()<<"~~"<<agents[i][j].getSatisfaction()<<"~~"<<strategyNames.str()<<"~~"<< strategyParams.str()<<"~~"<<agentsinfo[i][j].getgroversbankprofit()<<endl;
+            cout<< i << "~~" << j <<"~~"<<wl<<"~~"<<wh<<"~~" << agents[i][j].getIncomeDissimilarity()<<"~~"<<agents[i][j].getSatisfaction()<<"~~"<<strategyNames.str()<<"~~"<< strategyParams.str()<<"~~"<<agentsinfo[i][j].getgroversbankprofit()<<endl;
            }
 
         }
