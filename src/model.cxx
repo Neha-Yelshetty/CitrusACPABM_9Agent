@@ -668,6 +668,7 @@ void Phase5() {
                 if (rel_t == 0) {
                     //VC
                     agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost(); 
+                    //agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
                     //FC
                     //agents[i][j].costs += agents[i][j].getFixedCosts();
                     //agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
@@ -676,36 +677,36 @@ void Phase5() {
                  
                 //Harvest
                 if (agents[i][j].getCrop()->isHarvestPeriod(rel_t)) {
-                    //cout<<i<<"~~"<<j<<agents[i][j].behaviorPatterns[0]->getName()<<endl;
+                    //Yield of crop at projected age
+                    adjustedReturns =0;
                     for (int k = ibounds[0]; k < ibounds[1]; k++) {
                         for (int l = jbounds[0]; l < jbounds[1]; l++) {
                             //No yield if tree is dead
                             if (!bioABM::isTreeAlive(k,l)) {
                                 continue;
                             }
-                            
+
                             //Projected severity based on days since initial infection
                              severity = bioABM::getSeverityAt(k, l);
-
-                            //Yield of crop at projected age
-                            returns = numCrops * agents[i][j].getCrop()->getReturns();
                             
                             if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[0]->getName().find("OTC") != std::string::npos)
                             {                                
                                 //Infected yield: Units yielded times projected decay
-                                adjustedReturns = returns * getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
+                                adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
                             }
                             else
-                            {                                
+                            {   
+                     
                                 //Infected yield: Units yielded times projected decay
-                                adjustedReturns = returns * getInfectedYield(severity);  
+                                adjustedReturns +=  getInfectedYield(severity);
+                                //cout<<"adjustedReturns : " << adjustedReturns << " ";   
                             }
 
-
-                            agents[i][j].returns += adjustedReturns;
-                        // cout<< agents[i][j].getCrop()->getFreshYield();
                         }
                     }
+                    returns = numCrops * agents[i][j].getCrop()->getReturns();
+                    agents[i][j].returns += returns + adjustedReturns;
+                    returns =0;
                 }
                 
                 // Storing the information in the grovers bank and calculating the memory length
@@ -924,7 +925,7 @@ void calcuatesatisfaction(int i,int j)
 
 
     double meanSatisfaction = std::accumulate(current_satisfaction.begin(), current_satisfaction.end(), 0.0);
-    cout<<meanSatisfaction<<endl;
+    cout<<"meanSatisfaction :" << meanSatisfaction<<endl;
     if(meanSatisfaction > 0)
       agents[i][j].setSatisfaction(1); //1
     else
