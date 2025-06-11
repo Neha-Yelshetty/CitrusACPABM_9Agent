@@ -657,6 +657,7 @@ void Phase5() {
     double severity = 0;
     double returns = 0;
     double adjustedReturns = 0;
+    double adjustedcost = 0;
     
     for (int i = 0; i < ParameterSet::gridLength; i++) {
         for(int j=0; j<ParameterSet::gridWidth;j++){
@@ -668,13 +669,19 @@ void Phase5() {
                 if (rel_t == 0) {
                     //VC
                     agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost(); 
+                    agents[i][j].costs += agents[i][j].getCrop()->costs;
+                    if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
+                    {
+                        agents[i][j].costs += 1.94 * numCrops;
+                        adjustedcost =  1.94 * numCrops;
+                    }
+                    //cout << i<<j<<numCrops * agents[i][j].getCrop()->getVariableCost() << "--" <<  agents[i][j].getCrop()->costs << "--"  << adjustedcost << endl;
+
                     //agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
                     //FC
                     //agents[i][j].costs += agents[i][j].getFixedCosts();
                     //agents[i][j].costs += (agents[i][j].getCrop()->costs) * (10833);
                 }
-                
-                 
                 //Harvest
                 if (agents[i][j].getCrop()->isHarvestPeriod(rel_t)) {
                     //Yield of crop at projected age
@@ -685,11 +692,9 @@ void Phase5() {
                             if (!bioABM::isTreeAlive(k,l)) {
                                 continue;
                             }
-
                             //Projected severity based on days since initial infection
                              severity = bioABM::getSeverityAt(k, l);
-                            
-                            if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[0]->getName().find("OTC") != std::string::npos)
+                            if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
                             {                                
                                 //Infected yield: Units yielded times projected decay
                                 adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
@@ -768,8 +773,8 @@ void Phase5() {
         }
         else
         {
-            agents[i][j].costs = 0;
-            agents[i][j].returns = 0;
+            //agents[i][j].costs = 0;
+            //agents[i][j].returns = 0;
             agentsinfo[i][j].setgroverbankparameters(0,0,"optout");
 
         }

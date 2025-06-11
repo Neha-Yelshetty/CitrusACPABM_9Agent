@@ -64,6 +64,7 @@ public:
     double getSatisfaction() { return this->satisfaction; }
     double getIncomeDissimilarity() { return this->incomedissimilarity; }
     double getActionType() {return this->actiontype;}
+    double getcost() {return (this->costs);};
 
 };
 
