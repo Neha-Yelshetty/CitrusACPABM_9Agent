@@ -61,11 +61,21 @@ for x in range(0,100):
     #econ_copy["noactionread_file_no"] = x
 
     bio_copy = copy.deepcopy(bioconfig_file)
-    invasionDays_lst = ["81,446"]
-    bio_copy["invasionDays"] = ','.join([x for x in invasionDays_lst])
-    invasionModality_lst = random.choices(range(1,7),k=len(invasionDays_lst))
-    invasionModalities = ','.join([str(x) for x in invasionModality_lst])
-    bio_copy["invasionModalities"] =  invasionModalities
+    invasionDays_lst = "81,446".split(",")  # Split into a list of separate values
+    bio_copy["invasionDays"] = ','.join(invasionDays_lst)  # Store it properly
+
+    # Pick a random value and replicate it for each invasion day
+    random_value = random.randint(1, 7)
+    invasionModality_lst = [random_value] * len(invasionDays_lst)
+
+    # Convert list to string
+    invasionModalities = ','.join(map(str, invasionModality_lst))
+
+    invasionGrove = random.randint(1,2)
+    print(invasionGrove)
+    print(invasionModality_lst)  
+    print(invasionModalities)  
+    bio_copy["invasionModalities"] = invasionModalities
     appendMasterTriples(econ_copy, bio_copy, f"26grove_varation",  masterConfigList, numSets=0,noofiteration = x)
 
 '''for e in [700,800,900]: #600,
@@ -93,6 +103,3 @@ pool = mp.Pool(mp.cpu_count())
 for _ in tqdm.tqdm(pool.imap_unordered(runInstance, masterConfigList), total=len(masterConfigList)):
     pass 
 pool.close()
-
-
-
