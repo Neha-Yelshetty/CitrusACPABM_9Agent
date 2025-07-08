@@ -18,7 +18,7 @@
   "adultSurvivalP": 0.9847,
   "nymphMinAgeToInfect": 17,
   "nymphMinAgeToBeInfected": 6,
-  "modelDuration": 7310,
+  "modelDuration": 3658,
   "fileName": "bio_output.csv",
   "initialInfectedPortion": 0.18,
   "initialNumPsyllids": 300,

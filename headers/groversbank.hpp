@@ -8,6 +8,7 @@ using namespace std;
 
 class Groversbank;
 
+
 class Groversbank {
 private:
   double profit;
@@ -16,11 +17,12 @@ private:
   string strategyParameters;
   int withhlbseverityyearcount;
   int nohlbseverityyearcount ;
+  double previou_year_profit;
 
 public:
 
     Groversbank();
-    Groversbank(double a,double hlbseverity,string behaviortype,string strategyParameters,int withhlbseverityyearcount,int nohlbseverityyearcount);
+    Groversbank(double a,double hlbseverity,string behaviortype,string strategyParameters,int withhlbseverityyearcount,int nohlbseverityyearcount,double previou_year_profit);
 
     double getgroversbankprofit() { return this->profit; }
     double getgroversbankhlbseverity() { return this->hlbseverity; }
@@ -28,6 +30,7 @@ public:
     string getgroversbankstrategyParameters() { return this->strategyParameters; }
     int getgroversbankwithhlbseverityyearcount() { return this->withhlbseverityyearcount; }
     int getgroversbanknohlbseverityyearcount() { return this->nohlbseverityyearcount; }
+    double getgroversbankpreviouyearprofit() { return this->previou_year_profit; }
     string getgroversbankinformation() {
       stringstream ss;
         ss << profit << "~" << behaviortype << "~" << strategyParameters ;
@@ -42,7 +45,7 @@ public:
     void setgroversbankstrategyParameters(string);
     void setgroversbankwithhlbseverityyearcount(int);
     void setgroversbanknohlbseverityyearcount(int);
-    
+    void setgroversbankpreviouyearprofit(double );
 
 };
 

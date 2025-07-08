@@ -161,7 +161,7 @@ void InitialiseCHMA(Commodity crop) {
                 if (stoi(sFlags_agent[0]) == 1) {
                     stringstream ss;
                     ss << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << ";" << stod(sParams_agent[0])<< ";" << stod(sParams_agent[1])<< ";" << stod(sParams_agent[4]);
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Rogue",ss.str(),0,0);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Rogue",ss.str(),0,0,0);
                     Behavior* rogue =  new RogueTrees(stod(sParams_agent[0]),
                                                     stod(sParams_agent[1]),
                                                     stod(sParams_agent[2]),
@@ -177,7 +177,7 @@ void InitialiseCHMA(Commodity crop) {
                 if (stoi(sFlags_agent[1]) == 1) {
                     stringstream ss;
                     ss << stod(sParams_agent[5]) << ";" << stod(sParams_agent[6]);
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Spray",ss.str(),0,0);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"Spray",ss.str(),0,0,0);
                     Behavior* spray = new SprayTrees(stod(sParams_agent[5]),
                                                     stod(sParams_agent[6]),
                                                     bioABM::getSpringStart(),
@@ -190,7 +190,7 @@ void InitialiseCHMA(Commodity crop) {
                 if (stoi(sFlags_agent[2]) == 1) {
                     stringstream ss;
                     ss << stod(sParams_agent[7]) << ";" << stod(sParams_agent[8]);
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"OTC",ss.str(),0,0);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"OTC",ss.str(),0,0,0);
                     Behavior* otc = new OTC(stod(sParams_agent[7]),
                                                     stod(sParams_agent[8]),
                                                     bioABM::getSpringStart(),
@@ -203,7 +203,7 @@ void InitialiseCHMA(Commodity crop) {
                 if (stoi(sFlags_agent[3]) == 1) {
                     stringstream ss;
                     ss << stod(sParams_agent[9]) << ";" << stod(sParams_agent[10]);
-                  agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"DensePlanting",ss.str(),0,0);
+                  agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"DensePlanting",ss.str(),0,0,0);
                     Behavior * dPlant = new DensePlanting(
                         stod(sParams_agent[7]),
                         stod(sParams_agent[8])
@@ -214,7 +214,7 @@ void InitialiseCHMA(Commodity crop) {
                 if (stoi(sFlags_agent[4]) == 1) {
                     stringstream ss;
                     ss << stod(sParams_agent[11]) << ";" << stod(sParams_agent[12]) << ";" << stod(sParams_agent[13])<< ";" << stod(sParams_agent[14])<< ";" << stod(sParams_agent[15])<< ";" << stod(sParams_agent[16]);
-                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"RectangularRogue",ss.str(),0,0);
+                   agentsinfo[i][j] = Groversbank(stod(ssagentsbankinfo[0]),stod(ssagentsbankinfo[1]),"RectangularRogue",ss.str(),0,0,0);
                     Behavior * wideRogue = new RectangularRogue(
                         stod(sParams_agent[11]),
                         stod(sParams_agent[12]),
@@ -298,7 +298,7 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     if (changestratergname == "RogueTrees" ) {
         stringstream ss;
         ss << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << ";" << stod(sParams_agent[0])<< ";" << stod(sParams_agent[1])<< ";" << stod(sParams_agent[4]);
-    agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Rogue",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+    agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Rogue",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount(),agentsinfo[i][j].getgroversbankpreviouyearprofit());
        Behavior* rogue = new RogueTrees(stod(sParams_agent[2]),
                        stod(sParams_agent[3]),
                        stod(sParams_agent[0]),
@@ -314,7 +314,7 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     if (changestratergname == "SprayTrees") {
      stringstream ss;
         ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]);
-     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Spray",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"Spray",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount(),agentsinfo[i][j].getgroversbankpreviouyearprofit());
       Behavior* spray = new SprayTrees(stod(sParams_agent[0]),
                                         stod(sParams_agent[1]),
                                         bioABM::getSpringStart(),
@@ -330,9 +330,9 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
     //Oxytetracycline
     if (changestratergname == "NoActionOTC") {
      stringstream ss;
-     cout<<"Hello :" << sParams[k] << endl;
+     //cout<<"Hello :" << sParams[k] << endl;
         ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]);
-     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"NoActionOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
+     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"NoActionOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount(),agentsinfo[i][j].getgroversbankpreviouyearprofit());
       Behavior* otc = new OTC(stod(sParams_agent[0]),
                                         stod(sParams_agent[1]),
                                         bioABM::getSpringStart(),
@@ -347,15 +347,16 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
 
     if (changestratergname == "SprayTreesOTC") {
      stringstream ss;
-     
-        ss << stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]) << ";" << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]);
-     agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"SprayTreesOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount());
-      //cout<<stod(sParams_agent[0]) << ";" << stod(sParams_agent[1]) << ";" << stod(sParams_agent[2]) << ";" << stod(sParams_agent[3]) << endl;
+      agentsinfo[i][j] = Groversbank(changeprofit,chnagehlbseverity,"SprayTreesOTC",ss.str(),agentsinfo[i][j].getgroversbankwithhlbseverityyearcount(),agentsinfo[i][j].getgroversbanknohlbseverityyearcount(),agentsinfo[i][j].getgroversbankpreviouyearprofit());
       Behavior* spray = new SprayTrees(stod(sParams_agent[0]),
                                         stod(sParams_agent[1]),
                                         bioABM::getSpringStart(),
                                         bioABM::getSummerStart(),
                                         bioABM::getFallStart());
+
+    agents[i][j].behaviorPatterns.clear();
+    agents[i][j].behaviorPatterns.push_back(spray); 
+    //agents[i][j].behaviorPatterns[0]->PlanActions();
       
       Behavior* otc = new OTC(stod(sParams_agent[2]),
                                         stod(sParams_agent[3]),
@@ -363,9 +364,8 @@ void ChangeGroverBehaviorType(Commodity crop,int i,int j,vector<string> sParams,
                                         bioABM::getSummerStart(),
                                         bioABM::getFallStart());
 
-        agents[i][j].behaviorPatterns.clear();
-        agents[i][j].behaviorPatterns.push_back(spray); 
-        agents[i][j].behaviorPatterns.push_back(otc); 
+        //agents[i][j].behaviorPatterns.clear();
+        agents[i][j].behaviorPatterns.push_back(otc);
         agents[i][j].behaviorPatterns[0]->PlanActions();
         
     }
@@ -386,7 +386,9 @@ void Phase2() {
                 int relativePeriod = period_t % 365;
                 for (int k = 0; k < agents[i][j].behaviorPatterns.size(); k++) {
                     if (agents[i][j].behaviorPatterns[k]->actionPlannedOnDay(relativePeriod)) {
+                        cout<< "i : " << i << "j : " << j << agents[i][j].behaviorPatterns[k]->getName();
                         agents[i][j].behaviorPatterns[k]->executeAction(&agents[i][j]);
+                    
                     }
                     
                 }
@@ -670,7 +672,10 @@ void Phase5() {
                     //VC
                     agents[i][j].costs += numCrops * agents[i][j].getCrop()->getVariableCost(); 
                     agents[i][j].costs += agents[i][j].getCrop()->costs;
-                    if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
+                    if(!agents[i][j].behaviorPatterns.empty() && 
+                        agents[i][j].behaviorPatterns.size() > 1 &&
+                        agents[i][j].behaviorPatterns[1] != nullptr &&
+                        agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
                     {
                         agents[i][j].costs += 1.94 * numCrops;
                         adjustedcost =  1.94 * numCrops;
@@ -694,7 +699,10 @@ void Phase5() {
                             }
                             //Projected severity based on days since initial infection
                              severity = bioABM::getSeverityAt(k, l);
-                            if(!agents[i][j].behaviorPatterns.empty() && agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
+                            if(!agents[i][j].behaviorPatterns.empty() &&
+                                agents[i][j].behaviorPatterns.size() > 1 &&
+                                agents[i][j].behaviorPatterns[1] != nullptr &&
+                                agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
                             {                                
                                 //Infected yield: Units yielded times projected decay
                                 adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
@@ -773,8 +781,8 @@ void Phase5() {
         }
         else
         {
-            //agents[i][j].costs = 0;
-            //agents[i][j].returns = 0;
+            agents[i][j].costs = 0;
+            agents[i][j].returns = 0;
             agentsinfo[i][j].setgroverbankparameters(0,0,"optout");
 
         }
@@ -952,21 +960,28 @@ void buildingmemorylength(int i, int j,int year)
             agents[i][j].memorylengthprofit.push_back(memoryvalue);
             count++;
         }
+        double profit = agents[i][j].returns - agents[i][j].costs;
         agents[i][j].memorylengthprofit.erase(agents[i][j].memorylengthprofit.begin());
-        agents[i][j].memorylengthprofit.push_back(agents[i][j].returns - agents[i][j].costs);
-        agentsinfo[i][j].setgroverbankprofit(agents[i][j].returns - agents[i][j].costs);
+        agents[i][j].memorylengthprofit.push_back(profit);
+        agentsinfo[i][j].setgroverbankprofit(profit);
         agentsinfo[i][j].setgroverbankhlbseverity(getMeanHLB(agents[i][j]));
-        //cout<< year << "~~" << agents[i][j].returns - agents[i][j].costs << endl;
+        agentsinfo[i][j].setgroversbankpreviouyearprofit(profit);
+
     }
     else
     {
         agents[i][j].memorylengthprofit.erase(agents[i][j].memorylengthprofit.begin());
-        agentsinfo[i][j].setgroverbankprofit(agents[i][j].returns - agents[i][j].costs-agents[i][j].memorylengthprofit[memorylength-1]);
-        agents[i][j].memorylengthprofit.push_back(agents[i][j].returns - agents[i][j].costs-agents[i][j].memorylengthprofit[memorylength-1]);
-        
+        double profit = agents[i][j].returns - agents[i][j].costs;
+
+        double current_profit = profit - agentsinfo[i][j].getgroversbankpreviouyearprofit();
+
+        agentsinfo[i][j].setgroversbankpreviouyearprofit(profit);
+
+        agents[i][j].memorylengthprofit.push_back(current_profit);
+        agentsinfo[i][j].setgroverbankprofit(current_profit);
         agentsinfo[i][j].setgroverbankhlbseverity(getMeanHLB(agents[i][j]));
 
-        //cout<< year << "~~" << agents[i][j].returns - agents[i][j].costs - agents[i][j].memorylengthprofit[memorylength-1] << endl;
+       //cout<< year << "~~" <<  current_profit << endl;
     }
     //End of building the memory length
             
@@ -1208,7 +1223,7 @@ void Phase6() {
             }
         }
 
-       
+       //cout<<"after memory build"<<endl;
 
         for ( i = 0; i < ParameterSet::gridLength; i++) {
             for( j=0; j<ParameterSet::gridWidth;j++){
@@ -1427,7 +1442,7 @@ void writeCSVLine() {
                         outputFile << 0 << ",";
                         outputFile << 0 << ",";
                         outputFile << 0 << ",";
-                        outputFile <<meanSeverity<< ",";
+                        outputFile << 0 << ",";
                         outputFile << strategyNames.str() << ",";
                         outputFile << strategyParams.str() << ",";
                         outputFile << getDeadTrees(agents[i][j]) << ",";
@@ -1511,11 +1526,11 @@ void runModel() {
             
             if((bioABM::getModelDay()%365) == 0)
             {
-                 //cout<<"Before 6" << bioABM::getModelDay() <<endl;
+                cout<<"Before 6" << bioABM::getModelDay() <<endl;
                 //Stage 6: Grovers Prediciton of Surrouding
                 Phase6();
 
-                 //cout<<"Before 7" << bioABM::getModelDay() <<endl;
+                cout<<"Before 7" << bioABM::getModelDay() <<endl;
                 //Stage 7: Work on the Optimization,Imitation
                 Phase7();
 

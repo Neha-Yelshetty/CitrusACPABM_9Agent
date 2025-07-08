@@ -5,13 +5,16 @@ Groversbank::Groversbank() {
    
 }
 
-Groversbank::Groversbank(double profit,double hlbseverity,string behaviortype,string strategyParameters,int withhlbseverityyearcount,int nohlbseverityyearcount) {
+
+
+Groversbank::Groversbank(double profit,double hlbseverity,string behaviortype,string strategyParameters,int withhlbseverityyearcount,int nohlbseverityyearcount,double previou_year_profit) {
     this->profit = profit;
     this->hlbseverity = hlbseverity;
     this->behaviortype = behaviortype;
     this->strategyParameters = strategyParameters;
     this->withhlbseverityyearcount = withhlbseverityyearcount;
     this->nohlbseverityyearcount = nohlbseverityyearcount;
+    this->previou_year_profit = previou_year_profit;
 }
 
 
@@ -44,5 +47,9 @@ void Groversbank::setgroversbankwithhlbseverityyearcount(int withhlbseverityyear
 
 void Groversbank::setgroversbanknohlbseverityyearcount(int nohlbseverityyearcount){
         this->nohlbseverityyearcount = nohlbseverityyearcount;
+}
+
+void Groversbank::setgroversbankpreviouyearprofit(double previou_year_profit){
+        this->previou_year_profit = previou_year_profit;
 }
 
