@@ -42,8 +42,10 @@ Commodity::Commodity(double freshYield, double juiceYield, double freshPrice, do
 }
 
 double Commodity::getReturns() {
-    return (freshYield * freshPrice) + (juiceYield * juicePrice);
+    //return (freshYield * freshPrice) + (juiceYield * juicePrice);
+    return (freshYield * freshPrice) ;
 }
+
 
 //Sets MaxAge
 void Commodity::setMaxAge(int age) {

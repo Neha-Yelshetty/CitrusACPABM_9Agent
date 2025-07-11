@@ -386,7 +386,7 @@ void Phase2() {
                 int relativePeriod = period_t % 365;
                 for (int k = 0; k < agents[i][j].behaviorPatterns.size(); k++) {
                     if (agents[i][j].behaviorPatterns[k]->actionPlannedOnDay(relativePeriod)) {
-                        cout<< "i : " << i << "j : " << j << agents[i][j].behaviorPatterns[k]->getName();
+                        //cout<< "i : " << i << "j : " << j << agents[i][j].behaviorPatterns[k]->getName();
                         agents[i][j].behaviorPatterns[k]->executeAction(&agents[i][j]);
                     
                     }
@@ -663,7 +663,7 @@ void Phase5() {
     
     for (int i = 0; i < ParameterSet::gridLength; i++) {
         for(int j=0; j<ParameterSet::gridWidth;j++){
-            if(agents[i][j].getActionType() != 1){
+            if(agents[i][j].getActionType() != 1 ){
                 int* ibounds = agents[i][j].getIBounds();
                 int* jbounds = agents[i][j].getJBounds();
                 int numCrops = (ibounds[1] - ibounds[0]) * (jbounds[1] - jbounds[0]);
@@ -705,20 +705,23 @@ void Phase5() {
                                 agents[i][j].behaviorPatterns[1]->getName().find("OTC") != std::string::npos)
                             {                                
                                 //Infected yield: Units yielded times projected decay
-                                adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
+                                //adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy());
+                                adjustedReturns +=  getInfectedYield(severity) * (1+ agents[i][j].behaviorPatterns[0]->getotcefficacy()) * agents[i][j].getCrop()->getFreshYield();
                             }
                             else
                             {   
                      
                                 //Infected yield: Units yielded times projected decay
-                                adjustedReturns +=  getInfectedYield(severity);
+                                //adjustedReturns +=  getInfectedYield(severity);
+                                adjustedReturns += getInfectedYield(severity) * agents[i][j].getCrop()->getFreshYield();
                                 //cout<<"adjustedReturns : " << adjustedReturns << " ";   
                             }
 
                         }
                     }
-                    returns = numCrops * agents[i][j].getCrop()->getReturns();
-                    agents[i][j].returns += returns + adjustedReturns;
+                    returns = adjustedReturns * agents[i][j].getCrop()->getfreshprice();
+                    
+                    agents[i][j].returns += returns;
                     returns =0;
                 }
                 
@@ -938,7 +941,7 @@ void calcuatesatisfaction(int i,int j)
 
 
     double meanSatisfaction = std::accumulate(current_satisfaction.begin(), current_satisfaction.end(), 0.0);
-    cout<<"meanSatisfaction :" << meanSatisfaction<<endl;
+    //cout<<"meanSatisfaction :" << meanSatisfaction<<endl;
     if(meanSatisfaction > 0)
       agents[i][j].setSatisfaction(1); //1
     else
@@ -1097,16 +1100,16 @@ void Optimization(int i, int j,int year,double currentprofit,double meanhlbsever
             if (pdata[k].getPreviousyeartime() == agentsinfo[i][j].getgroversbankwithhlbseverityyearcount() &&
                 pdata[k].getPreviousyearcummulative5yearprofit() > currentprofit) {
                 if (pdata[k].getPreviousyearcummulative5yearprofit() > maxamt) {
-                    if (meanhlbseverity > 0.003) { // Check if meanhlbseverity > 0.3%
-                        if (pdata[k].getPreviousyearstratergyname().find("OTC") != std::string::npos) { // Select OTC values
+                    if (meanhlbseverity > 0.2) { // HLB severity is high, prefer OTC strategies
+                        if (pdata[k].getPreviousyearstratergyname().find("OTC") != std::string::npos) {
                             maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
                             highestindex = k;
                         }
-                    } else { // Otherwise, pick non-OTC values
-
-                        maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
-                        highestindex = k;
-                        
+                    } else { // HLB severity is low, prefer non-OTC strategies
+                        if (pdata[k].getPreviousyearstratergyname().find("OTC") == std::string::npos) {
+                            maxamt = pdata[k].getPreviousyearcummulative5yearprofit();
+                            highestindex = k;
+                        }
                     }
                 }
             }

@@ -40,9 +40,9 @@ public:
     bool isHarvestPeriod(int t) { return std::find(harvestPeriods.begin(), harvestPeriods.end(), t) != harvestPeriods.end(); }
     double getReturns();
 
-    double getFreshYield() {return (this->freshPrice) ;};
+    double getFreshYield() {return (this->freshYield) ;};
 
-    
+    double getfreshprice() {return (this->freshPrice) ;};
 
 };
 #endif
