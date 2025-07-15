@@ -20,7 +20,7 @@
   "phiplus":0.28, 
   "phiminus":0.28,
   "lambda": 0.6,
-  "referenceincome":9600, 
+  "referenceincome":3300, 
   "wl":-0.6, 
   "wh":0.6,  
   "typeofnetwork":2
