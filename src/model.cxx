@@ -722,6 +722,10 @@ void Phase5() {
                     returns = adjustedReturns * agents[i][j].getCrop()->getfreshprice();
                     
                     agents[i][j].returns += returns;
+                    agentsinfo[i][j].setgroversbankcost(agents[i][j].costs);
+                    agentsinfo[i][j].setgroversbankreturnvaluet(agents[i][j].returns);
+                    agentsinfo[i][j].setgroversbankcummulativeprofit(agents[i][j].returns - agents[i][j].costs);
+
                     returns =0;
                 }
                 
@@ -784,9 +788,9 @@ void Phase5() {
         }
         else
         {
-            agents[i][j].costs = 0;
-            agents[i][j].returns = 0;
-            agentsinfo[i][j].setgroverbankparameters(0,0,"optout");
+            //agents[i][j].costs = 0;
+            //agents[i][j].returns = 0;
+            agentsinfo[i][j].setgroverbankbehaviortype("optout");
 
         }
      }
@@ -1359,8 +1363,7 @@ void writeCSVLine() {
                 pcummulative5yearprofitdata << "0";
                 pcummulativehlbzero5yearprofitdata << "0";
             }
-             if(agents[i][j].getActionType() != 1){
-                   
+
                     stringstream strategyNames;
                     stringstream strategyParams;
                     if (agents[i][j].behaviorPatterns.empty()) {
@@ -1379,10 +1382,21 @@ void writeCSVLine() {
                     }
                     outputFile << bioABM::getModelDay() << ","; 
                     outputFile << "g" << i << j << ",";
-                    outputFile << agents[i][j].costs << ",";
-                    outputFile << agents[i][j].returns << ",";
-                    outputFile << (agents[i][j].returns - agents[i][j].costs) << ",";
-                    outputFile << meanSeverity << ",";
+                    if(agents[i][j].getActionType() != 1)
+                    {
+                        outputFile << agents[i][j].costs << ",";
+                        outputFile << agents[i][j].returns << ",";
+                        outputFile << (agents[i][j].returns - agents[i][j].costs) << ",";
+                        outputFile << meanSeverity << ",";
+                    }
+                    else
+                    {
+                        
+                        outputFile << agentsinfo[i][j].getgroversbankcost() << ",";
+                        outputFile << agentsinfo[i][j].getgroversbankreturnvalue() << ",";
+                        outputFile << agentsinfo[i][j].getgroversbankcummulativeprofit() << ",";
+                        outputFile << agentsinfo[i][j].getgroversbankhlbseverity() << ",";
+                    }
                     outputFile << strategyNames.str() << ",";
                     outputFile << strategyParams.str() << ",";
                     outputFile << getDeadTrees(agents[i][j])<< ",";
@@ -1421,70 +1435,7 @@ void writeCSVLine() {
                     outputFile << agentsinfo[2][0].getgroversbankinformation()<< ","; 
                     outputFile << agentsinfo[2][1].getgroversbankinformation()<< ","; 
                     outputFile << agentsinfo[2][2].getgroversbankinformation()<< endl;  
-                }
-                else
-                {
-                        stringstream strategyNames;
-                        stringstream strategyParams;
-                        if (agents[i][j].behaviorPatterns.empty()) {
-                            strategyNames << "NoAction";
-                            strategyParams << "NA";
-                        }
-                        else {
-                            for (int k = 0; k < agents[i][j].behaviorPatterns.size(); k++) {
-                                strategyNames << agents[i][j].behaviorPatterns[k]->getName();
-                                strategyParams << agents[i][j].behaviorPatterns[k]->getParams();
-                                if (k != agents[i][j].behaviorPatterns.size() - 1) {
-                                    strategyNames << "-";
-                                    strategyParams << "-";
-                                }
-                            }
-                        }
-                        outputFile << bioABM::getModelDay() << ","; 
-                        outputFile << "g" << i << j << ",";
-                        outputFile << 0 << ",";
-                        outputFile << 0 << ",";
-                        outputFile << 0 << ",";
-                        outputFile << 0 << ",";
-                        outputFile << strategyNames.str() << ",";
-                        outputFile << strategyParams.str() << ",";
-                        outputFile << getDeadTrees(agents[i][j]) << ",";
-                        outputFile << 0<< ",";
-                        if(agents[i][j].getActionType() == 1)
-                            outputFile <<"Opt-Out"<< ","; 
-                        else if(agents[i][j].getActionType() == 2)
-                            outputFile <<"Repetition"<< ",";
-                        else if(agents[i][j].getActionType() == 3)
-                            outputFile <<"optimization"<< ",";
-                        else if(agents[i][j].getActionType() == 4)
-                            outputFile <<"Imitate"<< ",";
-                        else
-                            outputFile <<"Repetition"<< ",";
-
-                        outputFile << agents[i][j].getSatisfaction() << ",";
-                        outputFile << agents[i][j].getIncomeDissimilarity() << ",";
-                        if(typeofnetwork == 1)
-                            outputFile<<"Hub&Spoke-"<< grovernetwrokinfo[0][0]<< ",";
-                        else if(typeofnetwork == 2)
-                            outputFile<<"EveryBody"<< ",";
-                        else if(typeofnetwork == 3)
-                            outputFile<<"Neighbours"<< ",";
-                        else
-                            outputFile<<"EveryBody"<< ",";
-                        outputFile << wl << ","; 
-                        outputFile << wh << ",";
-                        outputFile << pcummulative5yearprofitdata.str() << ",";
-                        outputFile << pcummulativehlbzero5yearprofitdata.str() << ","; 
-                        outputFile << agentsinfo[0][0].getgroversbankinformation()<< ",";
-                        outputFile << agentsinfo[0][1].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[0][2].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[1][0].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[1][1].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[1][2].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[2][0].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[2][1].getgroversbankinformation()<< ","; 
-                        outputFile << agentsinfo[2][2].getgroversbankinformation()<< endl;  
-                }
+                
             }
     }
 }
